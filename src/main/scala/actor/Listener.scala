@@ -1,17 +1,18 @@
 package actor
 
 import akka.actor.Actor
-import message.PiApproximationMsg
+import message.AllResultMsg
 
 /**
   * Created by pabloperezgarcia on 18/12/2016.
   */
 class Listener extends Actor {
-  def receive = {
 
-    case PiApproximationMsg(pi, duration) ⇒
-      println("\n\tPi approximation: \t\t%s\n\tCalculation time: \t%s"
-        .format(pi, duration))
+  def receive: PartialFunction[Any, Unit] = {
+
+    case AllResultMsg(allResult, duration) ⇒
+      println("All result message %s in %s".format(allResult, duration))
       context.system.shutdown()
   }
+
 }

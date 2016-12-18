@@ -8,17 +8,14 @@ import message.{ResultMsg, WorkMsg}
   */
 class Worker extends Actor {
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case WorkMsg(start, nrOfElements) =>
       //sender Return asynchronously the message back to the master
-      sender ! ResultMsg(calculatePiFor(start, nrOfElements)) // perform the work
+      sender ! ResultMsg(returnResultMsg(start, nrOfElements)) // perform the work
   }
 
-  def calculatePiFor(start: Int, nrOfElements: Int): Double = {
-    var acc = 0.0
-    for (i ← start until (start + nrOfElements))
-      acc += 4.0 * (1 - (i % 2) * 2) / (2 * i + 1)
-    acc
+  def returnResultMsg(start: Int, nrOfElements: Int): String = {
+    s"Worker $start in thread ${Thread.currentThread().getName} finish job ${nrOfElements-start}"
   }
 
 }
