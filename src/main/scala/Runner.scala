@@ -13,7 +13,7 @@ object Runner extends App {
 
   def run(numberOfWorkers: Int, numberOfElements: Int, numberOfMessages: Int) {
     // Create an Akka system
-    val system = ActorSystem("PiSystem")
+    val system = ActorSystem("Politron-Chief")
 
     // create the result listener, which will print the result and shutdown the system
     val listener = system.actorOf(Props[Listener], name = "listener")

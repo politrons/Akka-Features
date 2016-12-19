@@ -2,7 +2,7 @@ package actor
 
 import akka.actor.{Actor, ActorRef, Props}
 import akka.routing.RoundRobinPool
-import message.{RunWorkersMsg, AllResultMsg, ResultMsg, WorkMsg}
+import message._
 
 import scala.concurrent.duration.Duration
 
@@ -16,32 +16,36 @@ class Master(nrOfWorkers: Int, numberOfMessages: Int, numberOfElements: Int, lis
   val start: Long = System.currentTimeMillis
 
   /**
-    * Factory router which will create workers once it´s invoked
+    * Factory router which will create a worker once it´s invoked to process a message
     */
   val workerRouter: ActorRef = context.actorOf(
     Props[Worker].withRouter(RoundRobinPool(nrOfWorkers)), name = "workerRouter")
 
   def receive: PartialFunction[Any, Unit] = {
     case RunWorkersMsg =>
-      runWorkers
+      runWorkers()
     case ResultMsg(value) =>
-      processWorkerResultMessage(value)
+      processWorkerResult(value)
   }
 
-  private def runWorkers = {
+  private def runWorkers() = {
     for (i <- 0 until numberOfMessages){
-      workerRouter ! WorkMsg(i * numberOfElements, numberOfElements)
+      workerRouter ! WorkMsg(i , numberOfElements)
     }
   }
 
-  private def processWorkerResultMessage(value: String) = {
-    workerResult = workerResult.concat("\n").concat(value)
+  private def processWorkerResult(value: String) = {
     numberOfResults += 1
+    workerResult = workerResult.concat("\n").concat(value)
     if (numberOfResults == numberOfMessages) {
-      // Send the result to the listener
-      listener ! AllResultMsg(workerResult, duration = Duration(System.currentTimeMillis - start, "millis"))
-      // Stops this actor and all its supervised children
-      context.stop(self)
+      processAllResult()
     }
+  }
+
+  private def processAllResult() = {
+    // Send the result to the listener
+    listener ! AllResultMsg(workerResult, duration = Duration(System.currentTimeMillis - start, "millis"))
+    // Stops this actor and all its supervised children
+    context.stop(self)
   }
 }

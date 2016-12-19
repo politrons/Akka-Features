@@ -14,8 +14,8 @@ class Worker extends Actor {
       sender ! ResultMsg(returnResultMsg(start, nrOfElements)) // perform the work
   }
 
-  def returnResultMsg(start: Int, nrOfElements: Int): String = {
-    s"Worker $start in thread ${Thread.currentThread().getName} finish job ${nrOfElements-start}"
+  def returnResultMsg(taskNumber: Int, nrOfElements: Int): String = {
+    s"Worker $taskNumber in thread ${Thread.currentThread().getName} finish job ${nrOfElements-taskNumber}"
   }
 
 }

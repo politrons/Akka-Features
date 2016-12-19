@@ -10,8 +10,10 @@ class Listener extends Actor {
 
   def receive: PartialFunction[Any, Unit] = {
 
-    case AllResultMsg(allResult, duration) ⇒
+    case AllResultMsg(allResult, duration) =>
+      println("=====================================")
       println("All result message %s in %s".format(allResult, duration))
+      println("=====================================")
       context.system.shutdown()
   }
 
