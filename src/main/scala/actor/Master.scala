@@ -1,9 +1,10 @@
 package actor
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.routing.RoundRobinPool
 import message._
 
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 
 /**
@@ -34,12 +35,15 @@ class Master(nrOfWorkers: Int, numberOfMessages: Int, numberOfElements: Int, lis
     }
   }
 
-  private def processWorkerResult(value: String) = {
-    numberOfResults += 1
-    workerResult = workerResult.concat("\n").concat(value)
-    if (numberOfResults == numberOfMessages) {
-      processAllResult()
-    }
+  private def processWorkerResult(future: Future[String]) = {
+    implicit val ec: ExecutionContext = ActorSystem().dispatcher
+    future.onComplete(value =>{
+      numberOfResults += 1
+      workerResult = workerResult.concat("\n").concat(value.get)
+      if (numberOfResults == numberOfMessages) {
+        processAllResult()
+      }
+    })
   }
 
   private def processAllResult() = {

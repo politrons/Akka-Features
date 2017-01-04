@@ -7,13 +7,15 @@ import message.RunWorkersMsg
   */
 object Runner extends App {
 
-  run(numberOfWorkers = 4, numberOfElements = 10000, numberOfMessages = 10000)
+  run(numberOfWorkers = 4, numberOfElements = 10, numberOfMessages = 10)
 
   // actors and messages ...
 
   def run(numberOfWorkers: Int, numberOfElements: Int, numberOfMessages: Int) {
     // Create an Akka system
     val system = ActorSystem("Politron-Chief")
+
+    system.mailboxes.deadLetterMailbox
 
     // create the result listener, which will print the result and shutdown the system
     val listener = system.actorOf(Props[Listener], name = "listener")

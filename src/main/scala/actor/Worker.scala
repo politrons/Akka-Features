@@ -1,7 +1,9 @@
 package actor
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorSystem}
 import message.{ResultMsg, WorkMsg}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by pabloperezgarcia on 18/12/2016.
@@ -14,8 +16,11 @@ class Worker extends Actor {
       sender ! ResultMsg(returnResultMsg(start, nrOfElements)) // perform the work
   }
 
-  def returnResultMsg(taskNumber: Int, nrOfElements: Int): String = {
-    s"Worker $taskNumber in thread ${Thread.currentThread().getName} finish job ${nrOfElements-taskNumber}"
+  private def returnResultMsg(taskNumber: Int, nrOfElements: Int): Future[String] = {
+    implicit val ec: ExecutionContext = ActorSystem().dispatcher
+    Future {
+      s"Worker $taskNumber in thread ${Thread.currentThread().getName} finish job ${nrOfElements-taskNumber}"
+    }
   }
 
 }
