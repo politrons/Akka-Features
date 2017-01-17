@@ -19,8 +19,9 @@ class Worker extends Actor {
   private def returnResultMsg(taskNumber: Int, nrOfElements: Int): Future[String] = {
     implicit val ec: ExecutionContext = ActorSystem().dispatcher
     Future {
-      s"Worker $taskNumber in thread ${Thread.currentThread().getName} finish job ${nrOfElements-taskNumber}"
+       s"Worker $taskNumber in thread ${Thread.currentThread().getName} finish job ${nrOfElements - taskNumber}"
     }
   }
+
 
 }
