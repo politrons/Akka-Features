@@ -15,8 +15,7 @@ object Fow extends App {
 
   def run(): Unit = {
 //    val fetchStrings: Flow[String, String] =
-//      Flow[String]
-//          .via()
+//      Flow.("A")
 //        .map(value => value.toUpperCase)
 
   }
