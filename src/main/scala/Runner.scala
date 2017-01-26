@@ -7,7 +7,7 @@ import message.RunWorkersMsg
   */
 object Runner extends App {
 
-  run(numberOfWorkers = 4, numberOfElements = 10, numberOfMessages = 10)
+  run(numberOfWorkers = 10, numberOfElements = 10, numberOfMessages = 100)
 
   // actors and messages ...
 

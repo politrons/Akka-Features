@@ -19,5 +19,6 @@ dependencies {
     compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.4.14'
     compile group: 'com.typesafe.akka', name: 'akka-stream_2.11', version: '2.4.14'
     compile group: 'org.scala-lang', name: 'scala-library', version: '2.11.8'
+    compile group: 'io.relayr', name: 'rabbitmq-scala-client_2.10', version: '0.1.3'
 }
 

@@ -64,7 +64,9 @@ class Master(nrOfWorkers: Int, numberOfMessages: Int, numberOfElements: Int, lis
     Sink.onComplete(result => {
       Source.single(result)
         .filter(r => r.isSuccess)
+        .map(r => r.get.toString.toUpperCase)
         .runForeach(done => {
+          println(done)
           callListener
           context.stop(self)
         })
