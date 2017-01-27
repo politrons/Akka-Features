@@ -16,6 +16,7 @@ object Agents extends App {
 
   implicit val context = ActorSystem()
   implicit val materializer = ActorMaterializer()
+
   runAgent()
 
   def runAgent() {
