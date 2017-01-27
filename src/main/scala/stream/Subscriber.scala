@@ -16,15 +16,23 @@ object Subscriber extends App {
   runSubscriber()
 
   def runSubscriber() {
-    val subscriberSource = Source.asSubscriber[Boolean]
-    val someFunctionSink = Sink.foreach(Console.println)
+    Source.single("Akka subscription!")
+      .to(Sink.fromSubscriber(createSubscriber()))
+      .run()
+  }
 
-    val flow = subscriberSource.to(someFunctionSink)
-
-    //create Reactive Streams Subscriber
-    val subscriber: Subscriber[Boolean] = flow.run()
-
-    //prints true
-    Source.single(true).to(Sink.fromSubscriber(subscriber)).run()
+  /**
+    * create Reactive Streams Subscriber:
+    * We create the source as subscriber and sink to get the lazy subscriber
+    * Once that we create the Source with value and we set the subscriber with "to" we start
+    * using the pipeline
+    * @return
+    */
+  private def createSubscriber():Subscriber[String] = {
+    val source = Source.asSubscriber[String]
+      .map(value => value.toUpperCase)
+      .filter(value => !value.isEmpty)
+    val sink = Sink.foreach(Console.println)
+    source to sink run()
   }
 }
