@@ -9,7 +9,8 @@ import scala.concurrent.Future
 
 
 /**
-  * Created by pabloperezgarcia on 27/01/2017.
+  * Agents are instance linked with a resource, and only this agent it´s able to mutate the resource
+  * The api of the agent allow us to update the resource sync and async
   */
 object Agents extends App {
 
