@@ -8,7 +8,7 @@ Some examples of last Akka distribution of lightbend
 
 * **Actors**
 
-    To run execution run [Runner](src/main/scala/Runner)
+    To run execution run [Runner](src/main/scala/Runner.scala)
 
     ![My image](src/main/resources/img/akkaActor.png)
     * [Master] (src/main/scala/actor/Master.scala)
