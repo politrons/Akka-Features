@@ -7,6 +7,9 @@ import org.reactivestreams.Subscriber
 
 /**
   * Created by pabloperezgarcia on 28/01/2017.
+  *
+  * Back pressure refers to pressure opposed to the desired flow of items in a pipe.
+  * It is often caused by long process that normally makes the pipe start having more input items that can process out.
   */
 object BackPressure extends App {
 
