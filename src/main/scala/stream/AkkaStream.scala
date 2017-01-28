@@ -56,6 +56,7 @@ object AkkaStream extends App {
     */
   def repeat(): Unit = {
     Source.repeat("Repeat")
+      .delay(500 millisecond)
       .map(value => value.toUpperCase)
       .to(Sink.foreach(value => println(s"item emitted:$value")))
       .run()
@@ -63,7 +64,9 @@ object AkkaStream extends App {
 
   /**
     * Using mapAsync operator, we pass a function which return a Future, the number of parallel run futures will
-    * be determine by the argument passed to the operator
+    * be determine by the argument passed to the operator.
+    *
+    * Delay operator will delay the emittion of the item in the pipeline the time specify in the operator
     */
   def mapAsync(): Unit = {
     Source(0 to 10)
