@@ -53,6 +53,8 @@ object AkkaStream extends App {
 
   /**
     * Create a `Source` that will continually emit the given element.
+    *
+    * Delay operator will delay the emittion of the item in the pipeline the time specify in the operator
     */
   def repeat(): Unit = {
     Source.repeat("Repeat")
@@ -65,8 +67,6 @@ object AkkaStream extends App {
   /**
     * Using mapAsync operator, we pass a function which return a Future, the number of parallel run futures will
     * be determine by the argument passed to the operator.
-    *
-    * Delay operator will delay the emittion of the item in the pipeline the time specify in the operator
     */
   def mapAsync(): Unit = {
     Source(0 to 10)
