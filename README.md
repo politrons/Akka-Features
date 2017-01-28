@@ -18,8 +18,7 @@ Most common features of Akka ecosystem of lightbend
 * **Stream**
 
     ![My image](src/main/resources/img/stream.png)
-    * [Source/Sink] (src/main/scala/stream/AkkaStream.scala)
-    * [Flow] (src/main/scala/stream/Flow.scala)
+    * [Operators] (src/main/scala/stream/AkkaStream.scala)
     * [Subscriber] (src/main/scala/stream/Subscriber.scala)
     * [Back-pressure] (src/main/scala/stream/BackPressure.scala)
 
