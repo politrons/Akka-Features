@@ -5,6 +5,8 @@ import message.AllResultMsg
 
 /**
   * Created by pabloperezgarcia on 18/12/2016.
+  *
+  * The responsibility of this actor it´s print the result once all workers has finish to process tasks,
   */
 class Listener extends Actor {
 

@@ -13,6 +13,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by pabloperezgarcia on 18/12/2016.
+  *
+  * As a mster Actor the responsibility of this actor, it´s just to distribute the job in the number of workers
+  * that we have configure in the pool
+  * The mailbox of workers are configure to use ACK, which means that if we dont receive an ack from the worker
+  * we will save the message in the dead letter box and we will print a warning log
   */
 class Master(nrOfWorkers: Int, numberOfMessages: Int, numberOfElements: Int, listener: ActorRef) extends Actor {
 
@@ -46,6 +51,12 @@ class Master(nrOfWorkers: Int, numberOfMessages: Int, numberOfElements: Int, lis
     """))
   }
 
+  /**
+    * Receive Partial function it´s the only function that we need to implement once we extend Actor class
+    * This partial function will receive the mailbox messge and it will use chain of responsability to deliver
+    * in the proper place using patter matching.
+    * @return
+    */
   def receive: PartialFunction[Any, Unit] = {
     case RunWorkersMsg =>
       runWorkers()
@@ -53,6 +64,12 @@ class Master(nrOfWorkers: Int, numberOfMessages: Int, numberOfElements: Int, lis
       processWorkerResult(value)
   }
 
+  /**
+    * Using Akka stream we will iterate over the number of message and we will send one per worker until we
+    * will reach the max worker pool, the mechanism to distribute message through the nodes it will be using
+    * round robin  mechanism.
+    * @return
+    */
   private def runWorkers() = {
     Source(0 to numberOfMessages)
       .runForeach(number => workerRouter ! WorkMsg(number, numberOfElements))
