@@ -3,7 +3,7 @@ Author  Pablo Perez Garcia
 ![My image](src/main/resources/img/akka.png)
 
 
-Some examples of last Akka distribution of lightbend
+Most common features of Akka ecosystem of lightbend
 
 
 * **Actors**
