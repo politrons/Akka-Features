@@ -5,6 +5,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.routing.RoundRobinPool
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
+import com.typesafe.config.ConfigFactory
 import message._
 
 import scala.concurrent.duration.Duration
@@ -23,9 +24,27 @@ class Master(nrOfWorkers: Int, numberOfMessages: Int, numberOfElements: Int, lis
 
   /**
     * Factory router which will create a worker once it´s invoked to process a message
+    * This worker actor will use the ActorSystem mailbox configuration
     */
-  val workerRouter: ActorRef = context.actorOf(
-    Props[Worker].withRouter(RoundRobinPool(nrOfWorkers)), name = "workerRouter")
+  val workerRouter: ActorRef = getAckActorSystem.actorOf(
+    Props[Worker]
+      .withDispatcher("peek-dispatcher")
+      .withRouter(RoundRobinPool(nrOfWorkers)), name = "workerRouter")
+
+
+  /**
+    * We create an ActorSystem with an mailbox configuration to use retries system and ack
+    * @return
+    */
+  private def getAckActorSystem = {
+    ActorSystem("AckSystem", ConfigFactory.parseString(
+      """
+    peek-dispatcher {
+      mailbox-type = "akka.contrib.mailbox.PeekMailboxType"
+      max-retries = 2
+    }
+    """))
+  }
 
   def receive: PartialFunction[Any, Unit] = {
     case RunWorkersMsg =>
