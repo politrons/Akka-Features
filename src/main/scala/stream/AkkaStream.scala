@@ -15,16 +15,16 @@ import akka.stream.scaladsl.{Sink, Source}
   *
   * Source -> Which we use the create a source with an element to emit in the pipeline
   * Flow -> Which can be used to emit just 1 element in the pipeline
-  * Sink -> which it will be the subscriber to the Source/Flow to consume the items emited.
+  * Sink -> which it will be the subscriber to the Source/Flow to consume the items emitted.
   */
 object AkkaStream extends App {
 
-  implicit val context = ActorSystem()
+  implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
 
-  run()
+  sourceToSink()
 
-  def run(): Unit = {
+  def sourceToSink(): Unit = {
     val sink = Sink.foreach(println)
 
     val source = Source(List("Akka", "Kafka", "Afakka", "Kakfta"))
