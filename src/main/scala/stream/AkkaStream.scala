@@ -3,6 +3,7 @@ package stream
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
+import org.junit.Test
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,17 +21,12 @@ import scala.concurrent.{ExecutionContext, Future}
   * Flow -> Which can be used to emit just 1 element in the pipeline
   * Sink -> which it will be the subscriber to the Source/Flow to consume the items emitted.
   */
-object AkkaStream extends App {
+class AkkaStream {
 
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
 
-  sourceToSink()
-  tick()
-  repeat()
-  mapAsync()
-
-  def sourceToSink(): Unit = {
+  @Test def sourceToSink(): Unit = {
     val sink = Sink.foreach(println)
 
     val source = Source(List("Akka", "Kafka", "Afakka", "Kakfta"))
@@ -44,7 +40,7 @@ object AkkaStream extends App {
     * Tick operator is like interval in Rx it will repeat the emittion of item with an initial delay
     * and an internal delay
     */
-  def tick(): Unit = {
+  @Test def tick(): Unit = {
     Source.tick(0 seconds, 1 seconds, "Tick")
       .map(value => value.toUpperCase)
       .to(Sink.foreach(value => println(s"item emitted:$value")))
@@ -56,7 +52,7 @@ object AkkaStream extends App {
     *
     * Delay operator will delay the emittion of the item in the pipeline the time specify in the operator
     */
-  def repeat(): Unit = {
+  @Test def repeat(): Unit = {
     Source.repeat("Repeat")
       .delay(500 millisecond)
       .map(value => value.toUpperCase)
@@ -68,7 +64,7 @@ object AkkaStream extends App {
     * Using mapAsync operator, we pass a function which return a Future, the number of parallel run futures will
     * be determine by the argument passed to the operator.
     */
-  def mapAsync(): Unit = {
+  @Test def mapAsync(): Unit = {
     Source(0 to 10)
       .mapAsync(2) { value =>
         implicit val ec: ExecutionContext = ActorSystem().dispatcher
@@ -79,6 +75,17 @@ object AkkaStream extends App {
         }
       }
       .to(Sink.foreach(value => println(s"Item emitted:$value in Thread:${Thread.currentThread().getName}")))
+      .run()
+  }
+
+  /**
+    * TakeWhile operator will emitt items while the predicate function return true.
+    * You can achieve the same result with filter+take operators
+    */
+  @Test def takeWhile(): Unit = {
+    Source(0 to 10)
+      .takeWhile(n => n < 5)
+      .to(Sink.foreach(value => println(s"item emitted:$value")))
       .run()
   }
 
