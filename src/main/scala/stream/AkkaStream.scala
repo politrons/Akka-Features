@@ -74,8 +74,7 @@ class AkkaStream {
           value
         }
       }
-      .to(Sink.foreach(value => println(s"Item emitted:$value in Thread:${Thread.currentThread().getName}")))
-      .run()
+      .runWith(Sink.foreach(value => println(s"Item emitted:$value in Thread:${Thread.currentThread().getName}")))
   }
 
   /**

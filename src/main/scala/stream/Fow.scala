@@ -2,8 +2,11 @@ package stream
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{Flow, Source}
 import org.junit.Test
+import scala.concurrent.Await
+import scala.concurrent.duration._
+
 
 /**
   * Created by pabloperezgarcia on 25/01/2017.
@@ -24,11 +27,10 @@ class Fow {
     val filterFlow = Flow[Int]
       .filter(value => value > 50)
       .take(2)
-    Source(0 to 10)
+    Await.result(Source(0 to 10)
       .via(increase)
       .via(filterFlow)
-      .to(Sink.foreach(value => println(s"Item emitted:$value")))
-      .run()
+      .runForeach(value => println(s"Item emitted:$value")), 5 seconds)
   }
 
 }
