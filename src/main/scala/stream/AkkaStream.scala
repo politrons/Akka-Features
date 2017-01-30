@@ -78,6 +78,17 @@ class AkkaStream {
   }
 
   /**
+    * FlatMapConcat works like flatMap in Rx, it create a new Line of execution(Source) and once it finish
+    * It flat all the result to be emitted in the pipeline.
+    */
+  @Test def flatMap(): Unit = {
+    Await.ready(Source(0 to 10)
+      .flatMapConcat(value => Source.single(value)
+        .map(value => value * 10))
+      .runForeach(item => println(s"Item:$item")), 5 seconds)
+  }
+
+  /**
     * TakeWhile operator will emitt items while the predicate function return true.
     * You can achieve the same result with filter+take operators
     */
@@ -101,9 +112,9 @@ class AkkaStream {
 
   /**
     * When receive an item create a collection with the item emitted and wait to collect the number of
-    *  items specify in the operator.
-    *  In this case since we specify 5 we should print
-    *  Item emitted:Vector(0, 1, 2, 3, 4)
+    * items specify in the operator.
+    * In this case since we specify 5 we should print:
+    * (0, 1, 2, 3, 4)
     * (1, 2, 3, 4, 5)
     * (2, 3, 4, 5, 6)
     * (3, 4, 5, 6, 7)
@@ -118,6 +129,14 @@ class AkkaStream {
       , 5 seconds)
   }
 
+  /**
+    * Scan operator get the item emitted and it´s added into a collection to be passed in every emission.
+    */
+  @Test def scan(): Unit = {
+    Await.ready(Source(0 to 10)
+      .scan(List[Int]())((list, item) => list.::(item))
+      .runForeach(list => println(s"List:$list")), 5 seconds)
+  }
 
   def syncVal: String => String = {
     s => s.toUpperCase
