@@ -5,8 +5,8 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.junit.Test
 
-import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
 
 /**
   * Created by pabloperezgarcia on 25/01/2017.
@@ -18,7 +18,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
   * In Akka Stream we have three elements.
   *
   * Source -> Which we use the create a source with an element to emit in the pipeline
-  * Flow -> Which can be used to emit just 1 element in the pipeline
+  * Flow -> Which can be used to emit just 1 element in the pipeline, normally used by a Source with "via"
   * Sink -> which it will be the subscriber to the Source/Flow to consume the items emitted.
   */
 class AkkaStream {
@@ -33,31 +33,8 @@ class AkkaStream {
       .alsoTo(Sink.foreach(s => println(s"Input:$s")))
       .map(syncVal)
       .filter(_.contains("AKKA"))
+
     source to sink run()
-  }
-
-  /**
-    * Tick operator is like interval in Rx it will repeat the emittion of item with an initial delay
-    * and an internal delay
-    */
-  @Test def tick(): Unit = {
-    Source.tick(0 seconds, 1 seconds, "Tick")
-      .map(value => value.toUpperCase)
-      .to(Sink.foreach(value => println(s"item emitted:$value")))
-      .run()
-  }
-
-  /**
-    * Create a `Source` that will continually emit the given element.
-    *
-    * Delay operator will delay the emittion of the item in the pipeline the time specify in the operator
-    */
-  @Test def repeat(): Unit = {
-    Source.repeat("Repeat")
-      .delay(500 millisecond)
-      .map(value => value.toUpperCase)
-      .to(Sink.foreach(value => println(s"item emitted:$value")))
-      .run()
   }
 
   /**
@@ -86,6 +63,30 @@ class AkkaStream {
       .flatMapConcat(value => Source.single(value)
         .map(value => value * 10))
       .runForeach(item => println(s"Item:$item")), 5 seconds)
+  }
+
+  /**
+    * Tick operator is like interval in Rx it will repeat the emittion of item with an initial delay
+    * and an internal delay
+    */
+  @Test def tick(): Unit = {
+    Source.tick(0 seconds, 1 seconds, "Tick")
+      .map(value => value.toUpperCase)
+      .to(Sink.foreach(value => println(s"item emitted:$value")))
+      .run()
+  }
+
+  /**
+    * Create a `Source` that will continually emit the given element.
+    *
+    * Delay operator will delay the emittion of the item in the pipeline the time specify in the operator
+    */
+  @Test def repeat(): Unit = {
+    Source.repeat("Repeat")
+      .delay(500 millisecond)
+      .map(value => value.toUpperCase)
+      .to(Sink.foreach(value => println(s"item emitted:$value")))
+      .run()
   }
 
   /**
