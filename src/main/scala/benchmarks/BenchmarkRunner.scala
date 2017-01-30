@@ -14,7 +14,7 @@ import scala.language.postfixOps
   */
 object BenchmarkRunner extends App {
 
-  implicit val context = ActorSystem()
+  implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
   implicit val timeout = Timeout(5 seconds)
 
@@ -22,9 +22,11 @@ object BenchmarkRunner extends App {
 
   def run() {
 
-    context.mailboxes.deadLetterMailbox
+    system.mailboxes.deadLetterMailbox
 
-    val actorTask: ActorRef = context.actorOf(Props(new ActorTask()), name = "workerRouter")
+    val actorTask: ActorRef = system.actorOf(Props(new ActorTask()), name = "workerRouter")
+
+//    system.scheduler.schedule(0 seconds, 1 second)
 
     0 to 10 foreach (_ => actorTask ! "add")
 

@@ -6,7 +6,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.junit.Test
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
   * Created by pabloperezgarcia on 25/01/2017.
@@ -87,6 +87,37 @@ class AkkaStream {
       .to(Sink.foreach(value => println(s"item emitted:$value")))
       .run()
   }
+
+  /**
+    * Group the emission of items in groups define in the operator, in this case since start in 0
+    * and we group per 5 items we should end up having 3 collections.
+    */
+  @Test def group(): Unit = {
+    Await.result(Source(0 to 10)
+      .grouped(5)
+      .runForeach(value => println(s"Item emitted:$value"))
+      , 5 seconds)
+  }
+
+  /**
+    * When receive an item create a collection with the item emitted and wait to collect the number of
+    *  items specify in the operator.
+    *  In this case since we specify 5 we should print
+    *  Item emitted:Vector(0, 1, 2, 3, 4)
+    * (1, 2, 3, 4, 5)
+    * (2, 3, 4, 5, 6)
+    * (3, 4, 5, 6, 7)
+    * (4, 5, 6, 7, 8)
+    * (5, 6, 7, 8, 9)
+    * (6, 7, 8, 9, 10)
+    */
+  @Test def sliding(): Unit = {
+    Await.result(Source(0 to 10)
+      .sliding(5)
+      .runForeach(value => println(s"Item emitted:$value"))
+      , 5 seconds)
+  }
+
 
   def syncVal: String => String = {
     s => s.toUpperCase
