@@ -15,11 +15,11 @@ import persistence.response.{AddItemResponse, GetItemsResponse, RemoveItemRespon
   * persistenceId:  The id that we will use to identify the journal
   *
   * receiveCommand: The typical actor mailbox where we receive the commands.
-  *                 Here is where we will make use the function persist, where we persist the new events created
-  *                 through the information provided by the command.
+  * Here is where we will make use the function persist, where we persist the new events created
+  * through the information provided by the command.
   *
   * receiveRecover: Function which receive the events from the journey to rehydrate the state of the actor.
-  *                 Once that all events has been rehydrate invoke the message RecoveryCompleted
+  * Once that all events has been rehydrate invoke the message RecoveryCompleted
   */
 class BasketActor(id: String) extends PersistentActor with ActorLogging {
 
@@ -27,6 +27,7 @@ class BasketActor(id: String) extends PersistentActor with ActorLogging {
 
   /**
     * Here we set the identify of the journal
+    *
     * @return
     */
   override def persistenceId: String = id
@@ -35,20 +36,19 @@ class BasketActor(id: String) extends PersistentActor with ActorLogging {
     * As "receive" function in actor model, here we receive all commands to get the item and create the event
     * to persist.
     * Once that we persist the event we change the state of the actor
+    *
     * @return
     */
   override def receiveCommand: Receive = {
     case AddItemCommand(item) =>
       persist(ItemAdded(item)) { evt =>
-        state = applyEvent(evt)
         log.info(s"Item added:$item")
-        sender() ! AddItemResponse(item)
+        applyFunction(() => sender() ! AddItemResponse(item), evt)
       }
-    case RemoveItemCommand(itemId) =>
-      persist(ItemRemoved(itemId)) { evt =>
-        state = applyEvent(evt)
-        log.info(s"Remove item:$itemId")
-        sender() ! RemoveItemResponse(itemId)
+    case RemoveItemCommand(item) =>
+      persist(ItemRemoved(item)) { evt =>
+        log.info(s"Remove item:$item")
+        applyFunction(() => sender() ! RemoveItemResponse(item), evt)
       }
     case GetItemsRequest =>
       log.info("Get items:")
@@ -58,6 +58,7 @@ class BasketActor(id: String) extends PersistentActor with ActorLogging {
   /**
     * Before to persist any new item in the journey akka persistence rehydrate the state of your actor
     * in this case "state" Seq
+    *
     * @return
     */
   override def receiveRecover: Receive = {
@@ -65,6 +66,11 @@ class BasketActor(id: String) extends PersistentActor with ActorLogging {
       log.info(s"Recovering event:$evt")
       state = applyEvent(evt)
     case RecoveryCompleted => log.info("Recovery completed!")
+  }
+
+  def applyFunction(function: () => Unit, evt: ItemEvent): Unit = {
+    state = applyEvent(evt)
+    function.apply()
   }
 
   private def applyEvent(event: ItemEvent): Seq[String] = event match {

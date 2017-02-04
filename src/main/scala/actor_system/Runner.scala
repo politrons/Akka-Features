@@ -1,8 +1,8 @@
 package actor_system
 
-import actor.{Listener, Master}
+import actor_system.actor.{Listener, Master}
+import actor_system.message.RunWorkersMsg
 import akka.actor.{ActorSystem, Props}
-import message.RunWorkersMsg
 
 /**
   * Created by pabloperezgarcia on 18/12/2016.
