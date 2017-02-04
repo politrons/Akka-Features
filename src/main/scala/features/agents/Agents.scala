@@ -1,4 +1,4 @@
-package agents
+package features.agents
 
 import akka.actor.ActorSystem
 import akka.agent.Agent

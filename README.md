@@ -34,6 +34,6 @@ Most common features of Akka ecosystem of lightbend
 
 * **Features**
 
-    * [Agent] (src/main/scala/agents/Agents.scala)
+    * [Agent] (src/main/scala/agents/features/Agents.scala)
 
 
