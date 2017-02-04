@@ -10,9 +10,9 @@ import persistence.response.{AddItemResponse, GetItemsResponse, RemoveItemRespon
 /**
   * Created by pabloperezgarcia on 03/02/2017.
   *
-  * This class extend the behave of the Akka actors, forcing us to implement:
+  * This class extend the behave of the Akka actors with PersistentActor, forcing us to implement:
   *
-  * persistenceId: The id that we will use to identify the journal
+  * persistenceId:  The id that we will use to identify the journal
   *
   * receiveCommand: The typical actor mailbox where we receive the commands.
   *                 Here is where we will make use the function persist, where we persist the new events created
@@ -56,7 +56,7 @@ class BasketActor(id: String) extends PersistentActor with ActorLogging {
   }
 
   /**
-    * Before to persist any item in the journey akka persistence rehydrate the state of your actor
+    * Before to persist any new item in the journey akka persistence rehydrate the state of your actor
     * in this case "state" Seq
     * @return
     */
