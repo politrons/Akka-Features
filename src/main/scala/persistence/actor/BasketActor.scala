@@ -32,7 +32,7 @@ class BasketActor(id: String) extends PersistentActor with ActorLogging {
   override def persistenceId: String = id
 
   /**
-    * As receive in actor model, here we receive all commands to get the item and create the event
+    * As "receive" function in actor model, here we receive all commands to get the item and create the event
     * to persist.
     * Once that we persist the event we change the state of the actor
     * @return
@@ -71,4 +71,5 @@ class BasketActor(id: String) extends PersistentActor with ActorLogging {
     case ItemAdded(item) => item +: state
     case ItemRemoved(item) => state.filter(_ != item)
   }
+
 }
