@@ -18,7 +18,7 @@ Most common features of Akka ecosystem of lightbend
 * **Persistence**
 
     ![My image](src/main/resources/img/event.png)
-    * [Actor] (src/main/scala/persistence/actor/BasketActor.scala
+    * [Actor] (src/main/scala/persistence/actor/BasketActor.scala)
     * [Commands] (src/main/scala/persistence/commands)
     * [Events] (src/main/scala/persistence/events)
 
