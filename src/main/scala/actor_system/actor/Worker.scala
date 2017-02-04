@@ -1,8 +1,8 @@
-package actor
+package actor_system.actor
 
 import akka.actor.{Actor, ActorSystem}
 import akka.contrib.mailbox.PeekMailboxExtension
-import message.{ResultMsg, WorkMsg}
+import actor_system.message.{ResultMsg, WorkMsg}
 
 import scala.concurrent.{ExecutionContext, Future}
 

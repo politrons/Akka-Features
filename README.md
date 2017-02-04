@@ -9,9 +9,9 @@ Most common features of Akka ecosystem of lightbend
 * **Actors**
 
     ![My image](src/main/resources/img/akkaActor.png)
-    * [Master] (src/main/scala/actor/Master.scala)
-    * [Worker] (src/main/scala/actor/Worker.scala)
-    * [Listener] (src/main/scala/actor/Listener.scala)
+    * [Master] (src/main/scala/actor_system/actor/Master.scala)
+    * [Worker] (src/main/scala/actor_system/actor/Worker.scala)
+    * [Listener] (src/main/scala/actor_system/actor/Listener.scala)
 
     To run test execution [Here](src/main/scala/Runner.scala)
 

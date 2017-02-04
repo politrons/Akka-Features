@@ -1,7 +1,7 @@
-package actor
+package actor_system.actor
 
 import akka.actor.Actor
-import message.AllResultMsg
+import actor_system.message.AllResultMsg
 
 /**
   * Created by pabloperezgarcia on 18/12/2016.

@@ -1,4 +1,4 @@
-package message
+package actor_system.message
 
 
 import scala.concurrent.duration.Duration

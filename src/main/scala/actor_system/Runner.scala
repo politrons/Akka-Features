@@ -1,3 +1,5 @@
+package actor_system
+
 import actor.{Listener, Master}
 import akka.actor.{ActorSystem, Props}
 import message.RunWorkersMsg

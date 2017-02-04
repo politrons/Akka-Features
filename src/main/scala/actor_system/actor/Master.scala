@@ -1,4 +1,4 @@
-package actor
+package actor_system.actor
 
 import akka.NotUsed
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
@@ -6,7 +6,7 @@ import akka.routing.RoundRobinPool
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.typesafe.config.ConfigFactory
-import message._
+import actor_system.message._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
