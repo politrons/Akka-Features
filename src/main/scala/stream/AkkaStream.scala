@@ -5,8 +5,8 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.junit.Test
 
-import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
   * Created by pabloperezgarcia on 25/01/2017.
@@ -137,6 +137,23 @@ class AkkaStream {
     Await.ready(Source(0 to 10)
       .scan(List[Int]())((list, item) => list.::(item))
       .runForeach(list => println(s"List:$list")), 5 seconds)
+  }
+
+  val start = System.nanoTime()
+
+  /**
+    * Intersperse operator allow you the possibility to attach items in the emission of items in the pipeline
+    * Here for instance we add an item at the beginning of the emission, per item emitted and once we finish
+    */
+  @Test def intersperse(): Unit = {
+    Await.ready(Source(0 to 10)
+      .map(_.toString)
+      .intersperse("Start", separatorFunction.apply(), "End")
+      .runForeach(list => println(s"List:$list")), 5 seconds)
+  }
+
+  private def separatorFunction = {
+    () => "******************+"
   }
 
   def syncVal: String => String = {
