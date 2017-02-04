@@ -12,6 +12,8 @@ import persistence.response.{AddItemResponse, GetItemsResponse, RemoveItemRespon
   *
   * This class extend the behave of the Akka actors, forcing us to implement:
   *
+  * persistenceId: The id that we will use to identify the journal
+  *
   * receiveCommand: The typical actor mailbox where we receive the commands.
   *                 Here is where we will make use the function persist, where we persist the new events created
   *                 through the information provided by the command.
@@ -23,6 +25,10 @@ class BasketActor(id: String) extends PersistentActor with ActorLogging {
 
   private var state: Seq[String] = Seq.empty
 
+  /**
+    * Here we set the identify of the journal
+    * @return
+    */
   override def persistenceId: String = id
 
   /**
