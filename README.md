@@ -15,6 +15,16 @@ Most common features of Akka ecosystem of lightbend
 
     To run test execution [Here](src/main/scala/Runner.scala)
 
+* **Persistence**
+
+    ![My image](src/main/resources/img/event.png)
+    * [Actor persistence](src/main/scala/persistence/actor/BasketActor.scala
+    * [Commands](src/main/scala/persistence/commands)
+    * [Events](src/main/scala/persistence/events)
+
+    To run test execution [Here](src/main/scala/persistence/StreamRunner.scala)
+
+
 * **Stream**
 
     ![My image](src/main/resources/img/stream.png)
