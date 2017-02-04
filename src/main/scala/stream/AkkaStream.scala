@@ -94,10 +94,21 @@ class AkkaStream {
     * You can achieve the same result with filter+take operators
     */
   @Test def takeWhile(): Unit = {
-    Source(0 to 10)
+    Await.result(Source(0 to 10)
       .takeWhile(n => n < 5)
-      .to(Sink.foreach(value => println(s"item emitted:$value")))
-      .run()
+      .runForeach(value => println(s"Item emitted:$value"))
+      , 5 seconds)
+  }
+
+  /**
+    * DropWhile operator will drop items while the predicate function return true.
+    * You can achieve the same result with filter+drop operators
+    */
+  @Test def dropWhile(): Unit = {
+    Await.result(Source(0 to 10)
+      .dropWhile(n => n < 5)
+      .runForeach(value => println(s"Item emitted:$value"))
+      , 5 seconds)
   }
 
   /**
