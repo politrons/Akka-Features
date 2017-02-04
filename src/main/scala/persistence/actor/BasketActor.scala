@@ -33,15 +33,15 @@ class BasketActor(id: String) extends PersistentActor with ActorLogging {
     */
   override def receiveCommand: Receive = {
     case AddItemCommand(item) =>
-      log.info("Add item:")
       persist(ItemAdded(item)) { evt =>
         state = applyEvent(evt)
+        log.info(s"Item added:$item")
         sender() ! AddItemResponse(item)
       }
     case RemoveItemCommand(itemId) =>
-      log.info("Remove item:")
       persist(ItemRemoved(itemId)) { evt =>
         state = applyEvent(evt)
+        log.info(s"Remove item:$itemId")
         sender() ! RemoveItemResponse(itemId)
       }
     case GetItemsRequest =>
@@ -63,6 +63,6 @@ class BasketActor(id: String) extends PersistentActor with ActorLogging {
 
   private def applyEvent(event: ItemEvent): Seq[String] = event match {
     case ItemAdded(item) => item +: state
-    case ItemRemoved(item) => state.filter(_ == item)
+    case ItemRemoved(item) => state.filter(_ != item)
   }
 }

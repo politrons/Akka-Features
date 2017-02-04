@@ -1,44 +1,38 @@
 package persistence
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ActorSystem, Props, _}
+import akka.pattern.ask
+import akka.util.Timeout
 import persistence.actor.BasketActor
-import persistence.commands.AddItemCommand
+import persistence.commands.{AddItemCommand, RemoveItemCommand}
+import persistence.request.GetItemsRequest
+
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import scala.language.postfixOps
+
 
 /**
   * Created by pabloperezgarcia on 03/02/2017.
   */
 object StreamRunner extends App {
 
-  //  val customConf = ConfigFactory.parseString("""
-  //     akka.persistence {
-  //        journal.plugin = "inmemory-journal"
-  //        snapshot-store.plugin = "inmemory-snapshot-store"
-  //      }
-  //      """)
-  //
-  //  val system = ActorSystem("Politrons-stream",ConfigFactory.load(customConf) )
+  implicit val timeout = Timeout(10 seconds)
 
-  val system = ActorSystem("MySystem")
+  val system = ActorSystem("Politrons-persistence")
 
-//  system.mailboxes.deadLetterMailbox
-
-  // ConfigFactory.load sandwiches customConfig between default reference
-  // config and default overrides, and then resolves it.
-  //  val system = ActorSystem("MySystem", ConfigFactory.load(customConf))
-
-  val basketId = "sc-000001"
-
-  val basketActor = system.actorOf(Props(new BasketActor(basketId)))
-
-  private val item = new Item()
+  val basketActor = system.actorOf(Props(new BasketActor("akka-persistence-1")))
 
   basketActor ! AddItemCommand("cola")
   basketActor ! AddItemCommand("pepsi")
+  basketActor ! AddItemCommand("doritos")
+  basketActor ! RemoveItemCommand("pepsi")
+  basketActor ! AddItemCommand("budweiser")
+  basketActor ! RemoveItemCommand("cola")
 
+  val basket = Await.result(basketActor ? GetItemsRequest, timeout.duration)
 
-  //  basketActor ! "works"
+  println(s"Basket:$basket")
 
-  //  AddItemResponse(item)
-
-//  basketActor ! PoisonPill
+  basketActor ! PoisonPill
 }
