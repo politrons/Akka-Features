@@ -16,21 +16,31 @@ object WebServer extends App{
 
   implicit val system = ActorSystem("my-system")
   implicit val materializer = ActorMaterializer()
+
   // needed for the future flatMap/onComplete in the end
   implicit val executionContext = system.dispatcher
 
-  val route =
+  initializeService
+
+  private def initializeService = {
+    val bindingFuture = Http().bindAndHandle(initializeRoutes, "localhost", 8080)
+    bindingFuture.onComplete(_ => println(s"Server online at http://localhost:8080/\nPress RETURN to stop..."))
+    StdIn.readLine() // let it run until user presses return
+    bindingFuture
+      .flatMap(_.unbind()) // trigger unbinding from the port
+      .onComplete(_ ⇒ system.terminate()) // and shutdown when done
+  }
+
+  private def initializeRoutes = {
     path("hello") {
       get {
-        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
+        complete(getHelloResponse)
       }
     }
+  }
 
-  val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
+  private def getHelloResponse = {
+    HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>")
+  }
 
-  println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
-  StdIn.readLine() // let it run until user presses return
-  bindingFuture
-    .flatMap(_.unbind()) // trigger unbinding from the port
-    .onComplete(_ ⇒ system.terminate()) // and shutdown when done
 }
