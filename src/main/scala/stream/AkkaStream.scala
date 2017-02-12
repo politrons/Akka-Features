@@ -1,8 +1,9 @@
 package stream
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import org.junit.Test
 
 import scala.concurrent.duration._
@@ -38,6 +39,20 @@ class AkkaStream {
   }
 
   /**
+    * Flow is normally the glue between Source and sink, in Flow we define some operators where our items will pass over
+    * the pipeline. Making in this way, we can define some independent flows to be reused and avoid break DRY
+    * It´s even possible zip multiple flows in the same pipeline.
+    */
+  @Test def flow(): Unit = {
+    val doubleFlow = Flow[Int]
+      .map(_ * 2)
+      .filter(value => value < 10)
+    Await.ready(Source(0 to 10)
+      .via(doubleFlow)
+      .runWith(Sink.foreach(value => println(value))), 5 seconds)
+  }
+
+  /**
     * Using mapAsync operator, we pass a function which return a Future, the number of parallel run futures will
     * be determine by the argument passed to the operator.
     */
@@ -64,6 +79,14 @@ class AkkaStream {
         .map(value => value * 10))
       .runForeach(item => println(s"Item:$item")), 5 seconds)
   }
+
+  var sources: Seq[Source[Char, NotUsed]] = Seq(Source("hello"), Source("scala"), Source("world"))
+
+  @Test def zipWith(): Unit = {
+
+
+  }
+
 
   /**
     * Tick operator is like interval in Rx it will repeat the emittion of item with an initial delay
