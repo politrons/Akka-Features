@@ -90,7 +90,7 @@ class AkkaStream {
       .map(vector => vector.toStream
         .scan(new String)((b, b1) => mergeCharacters(b, b1))
         .last)
-      .runForeach(list => println(list)), 50 seconds)
+      .runForeach(word => println(word)), 5 seconds)
   }
 
   private def mergeCharacters(b: Any, b1: Any) = {
