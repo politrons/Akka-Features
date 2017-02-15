@@ -1,11 +1,11 @@
 package stream
 
-import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import org.junit.Test
 
+import scala.collection.immutable._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
@@ -80,13 +80,22 @@ class AkkaStream {
       .runForeach(item => println(s"Item:$item")), 5 seconds)
   }
 
-  var sources: Seq[Source[Char, NotUsed]] = Seq(Source("hello"), Source("scala"), Source("world"))
 
+  /**
+    * Zip operator allow you to merge together into a Vector multiple Sources
+    */
   @Test def zipWith(): Unit = {
-
-
+    val sources: Seq[Source[Char, _]] = Seq(Source("h"), Source("e"), Source("l"), Source("l"), Source("o"))
+    Await.ready(Source.zipN[Char](sources)
+      .map(vector => vector.toStream
+        .scan(new String)((b, b1) => mergeCharacters(b, b1))
+        .last)
+      .runForeach(list => println(list)), 50 seconds)
   }
 
+  private def mergeCharacters(b: Any, b1: Any) = {
+    b.asInstanceOf[String].concat(b1.asInstanceOf[Char].toString)
+  }
 
   /**
     * Tick operator is like interval in Rx it will repeat the emittion of item with an initial delay
