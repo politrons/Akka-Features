@@ -32,6 +32,14 @@ Most common features of Akka ecosystem of lightbend
     * [Subscriber] (src/main/scala/stream/Subscriber.scala)
     * [Back-pressure] (src/main/scala/stream/BackPressure.scala)
 
+* **Http**
+
+    ![My image](src/main/resources/img/http.png)
+    * [Client] (src/main/scala/http/ActorClient.scala)
+    * [Server] (src/main/scala/http/WebServer.scala)
+
+    To run test execution [Here](src/main/scala/http/ClientRunner.scala)
+
 * **Features**
 
     ![My image](src/main/resources/img/features.png)
