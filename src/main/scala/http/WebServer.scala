@@ -25,6 +25,7 @@ object WebServer extends App {
 
   val localhost = "localhost"
   val port = 8080
+  var order = ""
 
   initializeService
 
@@ -33,7 +34,7 @@ object WebServer extends App {
     *
     */
   private def initializeService = {
-    val serverFuture = Http().bindAndHandle(initializeRoutes, localhost, port)
+    val serverFuture = Http().bindAndHandle(routes, localhost, port)
     serverFuture.onComplete(_ => println(s"Server online at http://$localhost:$port/\nPress RETURN to stop..."))
     StdIn.readLine() // let it run until user presses return
     shutdownService(serverFuture)
@@ -52,10 +53,9 @@ object WebServer extends App {
 
   /**
     * Akka http provide a dsl to create the endpoints for the rest service
-    *
-    * @return
+    * The ~ character pass the request form one route to the next one in the chain.
     */
-  private def initializeRoutes = {
+  private def routes = {
     path("version") {
       get {
         complete(getVersionResponse)
@@ -76,7 +76,10 @@ object WebServer extends App {
       }
   }
 
-  def saveOrder(order: String) = Future.apply(order)
+  def saveOrder(order: String) = {
+    this.order = order
+    Future.apply(order)
+  }
 
 
   private def getVersionResponse = {
@@ -84,10 +87,10 @@ object WebServer extends App {
   }
 
   private def getOrderResponse = {
-    HttpEntity(ContentTypes.`text/html(UTF-8)`, "Get order")
+    HttpEntity(ContentTypes.`text/html(UTF-8)`, s"Get order $order")
   }
 
   private def getPostResponse(order: Try[String]) = {
-    HttpEntity(ContentTypes.`text/html(UTF-8)`, s"Order stored ${order.get} ")
+    HttpEntity(ContentTypes.`text/html(UTF-8)`, s"Order ${order.get} stored")
   }
 }
