@@ -22,6 +22,9 @@ class ActorClient extends Actor with ActorLogging {
     * preStart method it´s invoked when the actor it´s completely initialized
     */
   override def preStart(): Unit = {
+    http.singleRequest(HttpRequest(uri = "http://localhost:8080/version"))
+      .pipeTo(self)
+
     http.singleRequest(HttpRequest(uri = "http://localhost:8080/order"))
       .pipeTo(self)
   }
@@ -36,7 +39,7 @@ class ActorClient extends Actor with ActorLogging {
   private def getBody(entity: ResponseEntity) = {
     entity.dataBytes
       .map(value => value.decodeString("UTF-8"))
-      .runForeach(value => log.info(s"Got response, body:$value "))
+      .runForeach(value => log.info(value))
   }
 }
 

@@ -56,28 +56,35 @@ object WebServer extends App {
     * @return
     */
   private def initializeRoutes = {
-    path("order") {
+    path("version") {
       get {
-        complete(getHelloResponse)
+        complete(getVersionResponse)
       }
     } ~
-      path("create-order") {
-        post {
-          entity(as[String]) { order =>
-            val saved: Future[String] = saveOrder(order)
-            onComplete(saved) { done =>
-              complete(getPostResponse(done))
+      path("order") {
+        get {
+          complete(getOrderResponse)
+        } ~
+          post {
+            entity(as[String]) { order =>
+              val saved: Future[String] = saveOrder(order)
+              onComplete(saved) { done =>
+                complete(getPostResponse(done))
+              }
             }
           }
-        }
       }
   }
 
   def saveOrder(order: String) = Future.apply(order)
 
 
-  private def getHelloResponse = {
-    HttpEntity(ContentTypes.`text/html(UTF-8)`, "Say hello to akka-http")
+  private def getVersionResponse = {
+    HttpEntity(ContentTypes.`text/html(UTF-8)`, "Akka-http version 1.0")
+  }
+
+  private def getOrderResponse = {
+    HttpEntity(ContentTypes.`text/html(UTF-8)`, "Get order")
   }
 
   private def getPostResponse(order: Try[String]) = {
