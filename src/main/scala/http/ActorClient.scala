@@ -22,7 +22,7 @@ class ActorClient extends Actor with ActorLogging {
     * preStart method it´s invoked when the actor it´s completely initialized
     */
   override def preStart(): Unit = {
-    http.singleRequest(HttpRequest(uri = "http://localhost:8080/hello"))
+    http.singleRequest(HttpRequest(uri = "http://localhost:8080/order"))
       .pipeTo(self)
   }
 

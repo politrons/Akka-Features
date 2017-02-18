@@ -9,7 +9,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 
 import scala.concurrent.Future
@@ -47,8 +46,8 @@ object WebServer extends App {
     */
   private def shutdownService(bindingFuture: Future[ServerBinding]) = {
     bindingFuture
-      .flatMap(_.unbind()) //
-      .onComplete(_ ⇒ system.terminate()) //
+      .flatMap(_.unbind())
+      .onComplete(_ ⇒ system.terminate())
   }
 
   /**
@@ -57,24 +56,13 @@ object WebServer extends App {
     * @return
     */
   private def initializeRoutes = {
-    path("hello") {
+    path("order") {
       get {
-
-        complete(getHelloResponse)
-      }
-    }
-  }
-
-  def saveOrder(order: String) = Future.apply(order)
-
-  val route: Route =
-    get {
-      path("order") {
         complete(getHelloResponse)
       }
     } ~
-      post {
-        path("create-order") {
+      path("create-order") {
+        post {
           entity(as[String]) { order =>
             val saved: Future[String] = saveOrder(order)
             onComplete(saved) { done =>
@@ -83,6 +71,10 @@ object WebServer extends App {
           }
         }
       }
+  }
+
+  def saveOrder(order: String) = Future.apply(order)
+
 
   private def getHelloResponse = {
     HttpEntity(ContentTypes.`text/html(UTF-8)`, "Say hello to akka-http")
