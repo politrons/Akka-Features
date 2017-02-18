@@ -34,7 +34,7 @@ Most common features of Akka ecosystem of lightbend
 
 * **Http**
 
-    ![My image](src/main/resources/img/http1.png)
+    ![My image](src/main/resources/img/http1.ico)
     * [Client] (src/main/scala/http/ActorClient.scala)
     * [Server] (src/main/scala/http/WebServer.scala)
 
