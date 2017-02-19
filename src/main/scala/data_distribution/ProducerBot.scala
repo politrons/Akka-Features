@@ -50,7 +50,7 @@ class ProducerBot extends Actor with ActorLogging {
   def receive = {
     case Tick =>
       val randomElement = ThreadLocalRandom.current().nextInt(97, 123).toChar.toString
-      log.info("Adding: {}", randomElement)
+      log.info("Producer adding: {}", randomElement)
       replicator ! Update(DataKey, ORSet.empty[String], WriteLocal)(_ + randomElement)
 
     case _: UpdateResponse[_] => //Ignore
