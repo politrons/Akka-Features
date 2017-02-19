@@ -33,7 +33,7 @@ class ProducerBot extends Actor with ActorLogging {
 
   import context.dispatcher
 
-  val tickTask: Cancellable = context.system.scheduler.schedule(5.seconds, 5.seconds, self, Tick)
+  val tickTask: Cancellable = context.system.scheduler.schedule(5.seconds, 5.seconds, self, "Tick")
 
   val DataKey: ORSetKey[String] = ORSetKey[String]("uniqueKey")
 
@@ -48,7 +48,7 @@ class ProducerBot extends Actor with ActorLogging {
     * WriteAll the value will immediately be written to all nodes in the cluster (or all nodes in the cluster role group)
     */
   def receive = {
-    case Tick =>
+    case "Tick" =>
       val randomElement = ThreadLocalRandom.current().nextInt(97, 123).toChar.toString
       log.info("Producer adding: {}", randomElement)
       replicator ! Update(DataKey, ORSet.empty[String], WriteLocal)(_ + randomElement)
