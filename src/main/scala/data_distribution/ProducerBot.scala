@@ -3,10 +3,10 @@ package data_distribution
 
 import java.util.concurrent.ThreadLocalRandom
 
-import akka.actor.{Actor, ActorLogging, ActorRef}
+import akka.actor.{Actor, ActorLogging, ActorRef, Cancellable}
 import akka.cluster.Cluster
-import akka.cluster.ddata.{DistributedData, ORSet, ORSetKey}
 import akka.cluster.ddata.Replicator._
+import akka.cluster.ddata.{DistributedData, ORSet, ORSetKey}
 
 import scala.concurrent.duration._
 
@@ -33,7 +33,7 @@ class ProducerBot extends Actor with ActorLogging {
 
   import context.dispatcher
 
-  val tickTask = context.system.scheduler.schedule(5.seconds, 5.seconds, self, Tick)
+  val tickTask: Cancellable = context.system.scheduler.schedule(5.seconds, 5.seconds, self, Tick)
 
   val DataKey: ORSetKey[String] = ORSetKey[String]("uniqueKey")
 
@@ -42,29 +42,23 @@ class ProducerBot extends Actor with ActorLogging {
   /**
     * In Akka cluster distributed data we can write the changes in different ways:
     *
-    *   WriteLocal the value will immediately only be written to the local replica, and later disseminated with gossip
-    *   WriteTo(n) the value will immediately be written to at least n replicas, including the local replica
-    *   WriteMajority the value will immediately be written to a majority of replicas, i.e. at least N/2 + 1 replicas, where N is the number of nodes in the cluster (or cluster role group)
-    *   WriteAll the value will immediately be written to all nodes in the cluster (or all nodes in the cluster role group)
+    * WriteLocal the value will immediately only be written to the local replica, and later disseminated with gossip
+    * WriteTo(n) the value will immediately be written to at least n replicas, including the local replica
+    * WriteMajority the value will immediately be written to a majority of replicas, i.e. at least N/2 + 1 replicas, where N is the number of nodes in the cluster (or cluster role group)
+    * WriteAll the value will immediately be written to all nodes in the cluster (or all nodes in the cluster role group)
     */
   def receive = {
     case Tick =>
       val randomElement = ThreadLocalRandom.current().nextInt(97, 123).toChar.toString
-      if (ThreadLocalRandom.current().nextBoolean()) {
-        log.info("Adding: {}", randomElement)
-        replicator ! Update(DataKey, ORSet.empty[String], WriteLocal)(_ + randomElement)
-      } else {
-        log.info("Removing: {}", randomElement)
-        replicator ! Update(DataKey, ORSet.empty[String], WriteLocal)(_ - randomElement)
-      }
+      log.info("Adding: {}", randomElement)
+      replicator ! Update(DataKey, ORSet.empty[String], WriteLocal)(_ + randomElement)
 
     case _: UpdateResponse[_] => //Ignore
 
     //This case will get all changes in the ORSetKey
-    case element @ Changed(DataKey) =>
+    case element @Changed(DataKey) =>
       val data = element.get(DataKey)
-      log.info("Current elements: {}", data.elements)
-
+      log.info("Producer elements: {}", data.elements)
   }
 
   override def postStop(): Unit = tickTask.cancel()

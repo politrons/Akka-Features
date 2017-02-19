@@ -29,7 +29,7 @@ class ConsumerBot extends Actor with ActorLogging {
 
     case c@Changed(DataKey) =>
       val data = c.get(DataKey)
-      log.info("Updated current elements: {}", data.elements)
+      log.info("Consumer elements: {}", data.elements)
 
   }
 
