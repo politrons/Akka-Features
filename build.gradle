@@ -23,6 +23,7 @@ dependencies {
     compile group: 'com.typesafe.akka', name: 'akka-testkit_2.11', version: '2.4.16'
     compile group: 'com.typesafe.akka', name: 'akka-http_2.11', version: '10.0.3'
     compile group: 'com.typesafe.akka', name: 'akka-http-core_2.11', version: '10.0.3'
+    compile group: 'com.typesafe.akka', name: 'akka-distributed-data-experimental_2.11', version: '2.4.16'
     compile group: 'org.iq80.leveldb', name: 'leveldb', version: '0.7'
     compile group: 'org.fusesource.leveldbjni', name: 'leveldbjni-all', version: '1.8'
     compile group: 'org.scala-lang', name: 'scala-library', version: '2.11.8'
