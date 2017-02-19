@@ -64,19 +64,22 @@ object WebServer extends App {
       path("order") {
         get {
           entity(as[String]) { id =>
-          complete(getOrderResponse(id))
+            complete(getOrderResponse(id))
           }
         } ~
           post {
             entity(as[String]) { order =>
               val jsonOrder = JSON.parseFull(order)
-              val saved: Future[Map[String, String]] = saveOrder(jsonOrder.get.asInstanceOf[Map[String, String]])
-              onComplete(saved) { _ =>
+              onComplete(saveOrder(getOrderBody(jsonOrder))) { _ =>
                 complete(getPostResponse)
               }
             }
           }
       }
+  }
+
+  private def getOrderBody(jsonOrder: Option[Any]) = {
+    jsonOrder.get.asInstanceOf[Map[String, String]]
   }
 
   def saveOrder(order: Map[String, String]): Future[Map[String, String]] = {
@@ -92,7 +95,7 @@ object WebServer extends App {
     HttpEntity(ContentTypes.`text/html(UTF-8)`, "Akka-http version 1.0")
   }
 
-  private def getOrderResponse(id:String) = {
+  private def getOrderResponse(id: String) = {
     HttpEntity(ContentTypes.`text/html(UTF-8)`, s"Get order ${order(id)}")
   }
 
