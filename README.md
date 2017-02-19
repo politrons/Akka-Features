@@ -40,7 +40,7 @@ Most common features of Akka ecosystem of lightbend
 
     To run test execution [Here](src/main/scala/http/ClientRunner.scala)
 
-* **Data distribution**
+* **Distributed Data**
 
     ![My image](src/main/resources/img/dd.png)
     * [Producer] (src/main/scala/data_distribution/ProducerBot.scala)

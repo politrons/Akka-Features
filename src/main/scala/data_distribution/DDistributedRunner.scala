@@ -8,7 +8,7 @@ import scala.language.postfixOps
 /**
   * Created by pabloperezgarcia on 03/02/2017.
   */
-object DDistributerRunner extends App {
+object DDistributedRunner extends App {
 
   val system = ActorSystem("Politrons-cluster")
 
