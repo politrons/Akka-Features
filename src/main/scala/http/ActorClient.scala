@@ -37,13 +37,21 @@ class ActorClient extends Actor with ActorLogging {
   }
 
   private def postOrder = {
-    val data = ByteString("abc")
-    http.singleRequest(HttpRequest(HttpMethods.POST, uri = "http://localhost:8080/order", entity = data))
+    http.singleRequest(HttpRequest(HttpMethods.POST, uri = "http://localhost:8080/order", entity = ByteString(createBody)))
       .pipeTo(self)
   }
 
+  private def createBody = {
+    """
+        {
+            "id":"1",
+            "product":"cocal-cola"
+        }
+      """.stripMargin
+  }
+
   private def getOrder = {
-    http.singleRequest(HttpRequest(uri = "http://localhost:8080/order"))
+    http.singleRequest(HttpRequest(uri = "http://localhost:8080/order", entity = "1"))
       .pipeTo(self)
   }
 

@@ -13,7 +13,7 @@ import akka.stream.ActorMaterializer
 
 import scala.concurrent.Future
 import scala.io.StdIn
-import scala.util.Try
+import scala.util.parsing.json.JSON
 
 object WebServer extends App {
 
@@ -25,7 +25,7 @@ object WebServer extends App {
 
   val localhost = "localhost"
   val port = 8080
-  var order = ""
+  var order = Map[String, String]()
 
   initializeService
 
@@ -63,34 +63,40 @@ object WebServer extends App {
     } ~
       path("order") {
         get {
-          complete(getOrderResponse)
+          entity(as[String]) { id =>
+          complete(getOrderResponse(id))
+          }
         } ~
           post {
             entity(as[String]) { order =>
-              val saved: Future[String] = saveOrder(order)
-              onComplete(saved) { done =>
-                complete(getPostResponse(done))
+              val jsonOrder = JSON.parseFull(order)
+              val saved: Future[Map[String, String]] = saveOrder(jsonOrder.get.asInstanceOf[Map[String, String]])
+              onComplete(saved) { _ =>
+                complete(getPostResponse)
               }
             }
           }
       }
   }
 
-  def saveOrder(order: String) = {
-    this.order = order
+  def saveOrder(order: Map[String, String]): Future[Map[String, String]] = {
+    this.order = this.order ++ getBodyMap(order)
     Future.apply(order)
   }
 
+  private def getBodyMap(order: Map[String, String]) = {
+    Map[String, String](order("id") -> order("product"))
+  }
 
   private def getVersionResponse = {
     HttpEntity(ContentTypes.`text/html(UTF-8)`, "Akka-http version 1.0")
   }
 
-  private def getOrderResponse = {
-    HttpEntity(ContentTypes.`text/html(UTF-8)`, s"Get order $order")
+  private def getOrderResponse(id:String) = {
+    HttpEntity(ContentTypes.`text/html(UTF-8)`, s"Get order ${order(id)}")
   }
 
-  private def getPostResponse(order: Try[String]) = {
-    HttpEntity(ContentTypes.`text/html(UTF-8)`, s"Order ${order.get} stored")
+  private def getPostResponse = {
+    HttpEntity(ContentTypes.`text/html(UTF-8)`, s"Order stored")
   }
 }
