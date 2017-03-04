@@ -15,6 +15,12 @@ Most common features of Akka ecosystem of lightbend
 
     To run test execution [Here](src/main/scala/Runner.scala)
 
+* **Typed Actor**
+
+    ![My image](src/main/resources/img/typed.png)
+    * [Typed] (src/main/scala/typed_actor)
+    To run test execution [Here](src/main/scala/Runner.scala)
+
 * **Persistence**
 
     ![My image](src/main/resources/img/event.png)
