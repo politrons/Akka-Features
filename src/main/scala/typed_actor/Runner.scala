@@ -15,6 +15,9 @@ import scala.concurrent.duration._
   * Typed Actor works as Actor with the different that instead to have just one entry point of message onReceive
   * as we have with actors, here we define as entry point of message all the methods defined in the interface.
   *
+  * To create our typed actor we just need to make use of TypedActor class, which we will provide with a typedProps
+  * with the information of the POJO to create as actor.
+  *
   * The message mechanism can be
   *
   * Fire and forget:We send the message and we dont wait for the response
