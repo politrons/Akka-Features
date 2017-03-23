@@ -9,25 +9,25 @@ Most common features of Akka ecosystem of lightbend
 * **Actors**
 
     ![My image](src/main/resources/img/akkaActor.png)
-    * [Master] (src/main/scala/actor_system/actor/Master.scala)
-    * [Worker] (src/main/scala/actor_system/actor/Worker.scala)
-    * [Listener] (src/main/scala/actor_system/actor/Listener.scala)
+    * [Master](src/main/scala/actor_system/actor/Master.scala)
+    * [Worker](src/main/scala/actor_system/actor/Worker.scala)
+    * [Listener](src/main/scala/actor_system/actor/Listener.scala)
 
     To run test execution [Here](src/main/scala/Runner.scala)
 
 * **Typed Actor**
 
     ![My image](src/main/resources/img/typed.png)
-    * [Typed] (src/main/scala/typed_actor)
+    * [Typed](src/main/scala/typed_actor)
     
     To run test execution [Here](src/main/scala/Runner.scala)
 
 * **Persistence**
 
     ![My image](src/main/resources/img/event.png)
-    * [Actor] (src/main/scala/persistence/actor/BasketActor.scala)
-    * [Commands] (src/main/scala/persistence/commands)
-    * [Events] (src/main/scala/persistence/events)
+    * [Actor](src/main/scala/persistence/actor/BasketActor.scala)
+    * [Commands](src/main/scala/persistence/commands)
+    * [Events](src/main/scala/persistence/events)
 
     To run test execution [Here](src/main/scala/persistence/StreamRunner.scala)
 
@@ -35,29 +35,29 @@ Most common features of Akka ecosystem of lightbend
 * **Stream**
 
     ![My image](src/main/resources/img/stream.png)
-    * [Operators] (src/main/scala/stream/AkkaStream.scala)
-    * [Subscriber] (src/main/scala/stream/Subscriber.scala)
-    * [Back-pressure] (src/main/scala/stream/BackPressure.scala)
+    * [Operators](src/main/scala/stream/AkkaStream.scala)
+    * [Subscriber](src/main/scala/stream/Subscriber.scala)
+    * [Back-pressure](src/main/scala/stream/BackPressure.scala)
 
 * **Http**
 
     ![My image](src/main/resources/img/http1.ico)
-    * [Client] (src/main/scala/http/ActorClient.scala)
-    * [Server] (src/main/scala/http/WebServer.scala)
+    * [Client](src/main/scala/http/ActorClient.scala)
+    * [Server](src/main/scala/http/WebServer.scala)
 
     To run test execution [Here](src/main/scala/http/ClientRunner.scala)
 
 * **Distributed Data**
 
     ![My image](src/main/resources/img/dd.png)
-    * [Producer] (src/main/scala/data_distribution/ProducerBot.scala)
-    * [Consumer] (src/main/scala/data_distribution/ConsumerBot.scala)
+    * [Producer](src/main/scala/data_distribution/ProducerBot.scala)
+    * [Consumer](src/main/scala/data_distribution/ConsumerBot.scala)
 
     To run test execution [Here](src/main/scala/data_distribution/DDistributerRunner.scala)
 
 * **Features**
 
     ![My image](src/main/resources/img/features.png)
-    * [Agent] (src/main/scala/features/agents/Agents.scala)
+    * [Agent](src/main/scala/features/agents/Agents.scala)
 
 
