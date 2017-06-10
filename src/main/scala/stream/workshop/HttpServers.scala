@@ -11,7 +11,7 @@ import com.twitter.util.{Await, Future}
 object HttpServers extends App {
 
   def service = Service.mk[Request, Response] { r: Request => {
-    Thread.sleep(5000)
+    Thread.sleep(2000)
     println(s"Processing request.......")
     val rep = Response()
     rep.setContentString(
@@ -25,6 +25,6 @@ object HttpServers extends App {
 
   Await.ready(Http.server
     .withResponseClassifier(HttpResponseClassifier.ServerErrorsAsFailures)
-    .withAdmissionControl.concurrencyLimit(maxConcurrentRequests = 1, maxWaiters = 5)
+    .withAdmissionControl.concurrencyLimit(maxConcurrentRequests = 1, maxWaiters = 10)
     .serve(s"localhost:1981", service))
 }

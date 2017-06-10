@@ -5,7 +5,9 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finagle.{Http, Service, http}
-import com.twitter.util.{Await, Future}
+import com.twitter.util.Await
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by pabloperezgarcia on 08/04/2017.
@@ -23,24 +25,21 @@ object HttpClient extends App {
 
   def request = http.Request(http.Method.Get, "/")
 
+  type pairResponse = (Int, Response)
+
   //  Source.tick(0 seconds, 100 millisecond, "Tick")
   Source(0 to 10)
     .via(requestFlow)
-    .to(Sink.foreach(pair => println(s"Response number ${pair._1} value ${pair._2}")))
+    .to(Sink.foreach(pair => println(s"Number ${pair._1} ${pair._2}")))
     .run()
 
   def requestFlow = Flow[Int]
-    .map(resNumber => {
-      println(s"Request $resNumber")
-      request.params
-      resNumber
+    .map(reqNumber => {
+      println(s"Request $reqNumber")
+      reqNumber
     })
-    .flatMapMerge(10, resNumber => Source.single(client(request))
-      .map(future => processResponse(resNumber, future)))
-
-  private def processResponse(resNumber: Int, future: Future[Response]) = {
-    val response = Await.result(future)
-    println(s"Response $response process, waiting for merge.....")
-    (resNumber, response)
+    .mapAsync[pairResponse](10) {
+    resNumber =>
+      scala.concurrent.Future(resNumber, Await.result(client(request)))
   }
 }

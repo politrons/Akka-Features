@@ -5,7 +5,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finagle.{Http, Service, http}
-import com.twitter.util.Await
+import com.twitter.util.{Await, Future}
 
 /**
   * Created by pabloperezgarcia on 08/04/2017.
@@ -21,7 +21,7 @@ object HttpClientBackPressure extends App {
 
   def client: Service[Request, Response] = Http.newService("localhost:1981")
 
-  def request(reqNumber: Int) = http.Request(http.Method.Get, s"/&reqNumber=$reqNumber")
+  def request = http.Request(http.Method.Get, s"/")
 
   Source(0 to 10)
     .via(requestFlow)
@@ -29,11 +29,29 @@ object HttpClientBackPressure extends App {
     .run()
 
   def requestFlow = Flow[Int]
+//    .groupedWithin(5, 20 seconds)
     .map(resNumber => {
-      println(s"Request:$resNumber")
+      println(s"Request $resNumber")
       resNumber
     })
-    .flatMapMerge(10, reqNumber => Source.single(client(request(reqNumber)))
-      .map(future => (reqNumber, Await.result(future))))
+    .flatMapMerge(10, resNumber => Source.single(client(request))
+      .map(future => processResponse(resNumber, future)))
+
+  private def processResponse(resNumber: Int, future: Future[Response]) = {
+    val response = Await.result(future)
+    println(s"$response processed, waiting for merge.....")
+    (resNumber, response)
+  }
+
+
+//  /**
+//    * GroupedWithin allow you group emission of items by a specific number of items or by a window time
+//    */
+//  @Test def groupedWithin(): Unit = {
+//    Await.ready(Source(0 to 10)
+//      .map(_.toString)
+//      .groupedWithin(3, 5 millisecond)
+//      .runForeach(list => println(s"List:$list")), 5 seconds)
+//  }
 
 }

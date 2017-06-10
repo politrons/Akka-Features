@@ -16,27 +16,36 @@ import scala.concurrent.{Await, ExecutionContext, Future}
   * Having those feature we can not only consume the message in a much better way but also and really important
   * have back-pressure mechanism which will prevent OutOfMemory problems in our system
   *
-  * In Akka Stream we have three elements.
+  * In Akka Stream we have three elements:
+  *     [Source]~>[Flow]~>[Sink]
   *
-  * Source -> Which we use the create a source with an element to emit in the pipeline
-  * Flow -> Which can be used to emit just 1 element in the pipeline, normally used by a Source with "via"
-  * Sink -> which it will be the subscriber to the Source/Flow to consume the items emitted.
+  *     Source: Origin of data, it could be multiple inputs
+  *     Flow: This part of the stream is where we transform the data that we introduce in our pipeline
+  *     Sink: This is where we receive all data once that has been processed in order to be printed,
+  *     passed to another source and so once with "via"
   */
 class AkkaStream {
 
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
 
-  @Test def sourceToSink(): Unit = {
+  @Test def sourceToFlowToSink(): Unit = {
     val sink = Sink.foreach(println)
 
-    val source = Source(List("Akka", "Kafka", "Afakka", "Kakfta"))
+    val flow = Flow[String]
       .alsoTo(Sink.foreach(s => println(s"Input:$s")))
-      .map(syncVal)
+      .map(s => s.toUpperCase)
       .filter(_.contains("AKKA"))
 
+    val source = Source(List("Akka", "Kafka", "Afakka", "Kakfta"))
+      .via(flow)
+
     source to sink run()
+
+    //Just to wait for the end of the execution
+    Thread.sleep(1000)
   }
+
 
   /**
     * Flow is normally the glue between Source and sink, in Flow we define some operators where our items will pass over
@@ -70,16 +79,33 @@ class AkkaStream {
   }
 
   /**
-    * FlatMapConcat works like flatMap in Rx, it create a new Line of execution(Source) and once it finish
+    * FlatMapConcat works like flatMap in Rx but sequentially since concat one emition to the next,
+    * it create a new Line of execution(Source) and once it finish
     * It flat all the result to be emitted in the pipeline.
     */
-  @Test def flatMap(): Unit = {
+  @Test def flatMapConcat(): Unit = {
     Await.ready(Source(0 to 10)
       .flatMapConcat(value => Source.single(value)
         .map(value => value * 10))
       .runForeach(item => println(s"Item:$item")), 5 seconds)
   }
 
+
+  /**
+    * FlatMapMerge works like flatMap in Rx all source run in parallel.
+    * Once that finish all source flatMap merge all results.
+    * it create a new Line of execution(Source) and once it finish
+    * It flat all the result to be emitted in the pipeline.
+    */
+  @Test def flatMapMerge(): Unit = {
+    Await.result(Source(0 to 10)
+      .via(requestFlow)
+      .runForeach(res => println(s"Item emitted:$res")), 5 seconds)
+
+    def requestFlow = Flow[Int]
+      .flatMapMerge(10, resNumber => Source.single(resNumber)
+        .map(res => res * 100))
+  }
 
   /**
     * Zip operator allow you to merge together into a Vector multiple Sources
@@ -199,7 +225,4 @@ class AkkaStream {
     () => "******************+"
   }
 
-  def syncVal: String => String = {
-    s => s.toUpperCase
-  }
 }
