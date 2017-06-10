@@ -19,7 +19,7 @@ import scala.concurrent.duration._
   *
   * In this example the producer it will subscribe to a specific ORSetKey and it will modify this one using scheduler.
   *
-  * All nodes subscribed with the same ORSetKey will recveive the notification of change in "element @ Changed(DataKey)"
+  * All nodes subscribed with the same ORSetKey will receive the notification of change in "element @ Changed(DataKey)"
   *
   * Official doc
   * http://doc.akka.io/docs/akka/2.4.16/scala/distributed-data.html
