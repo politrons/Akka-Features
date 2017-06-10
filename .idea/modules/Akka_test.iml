@@ -27,6 +27,7 @@
     <orderEntry type="library" name="Gradle: org.scalaz:scalaz-core_2.11:7.2.9" level="project" />
     <orderEntry type="library" name="Gradle: com.twitter:finagle-core_2.11:6.43.0" level="project" />
     <orderEntry type="library" name="Gradle: com.twitter:finagle-http_2.11:6.43.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.scalaj:scalaj-http_2.11:2.3.0" level="project" />
     <orderEntry type="library" name="Gradle: com.typesafe:config:1.3.0" level="project" />
     <orderEntry type="library" name="Gradle: org.scala-lang.modules:scala-java8-compat_2.11:0.7.0" level="project" />
     <orderEntry type="library" name="Gradle: org.reactivestreams:reactive-streams:1.0.0" level="project" />

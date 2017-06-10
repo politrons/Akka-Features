@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.scalaj:scalaj-http_2.11:2.3.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.scalaj/scalaj-http_2.11/2.3.0/9c0e4dbb5c2b908b1ee239edf803e893efd6d198/scalaj-http_2.11-2.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.scalaj/scalaj-http_2.11/2.3.0/55106da53ab14c5c9c656d068a3d1bd765b0c87a/scalaj-http_2.11-2.3.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -8,11 +8,11 @@ import com.twitter.util.{Await, Future}
 /**
   * Created by pabloperezgarcia on 08/04/2017.
   */
-object HttpServers extends App {
+object Server extends App {
 
   def service = Service.mk[Request, Response] { r: Request => {
-    Thread.sleep(2000)
     println(s"Processing request.......")
+    Thread.sleep(5000)
     val rep = Response()
     rep.setContentString(
       s"""
@@ -25,6 +25,6 @@ object HttpServers extends App {
 
   Await.ready(Http.server
     .withResponseClassifier(HttpResponseClassifier.ServerErrorsAsFailures)
-    .withAdmissionControl.concurrencyLimit(maxConcurrentRequests = 1, maxWaiters = 10)
+    .withAdmissionControl.concurrencyLimit(maxConcurrentRequests = 1, maxWaiters = 3)
     .serve(s"localhost:1981", service))
 }
