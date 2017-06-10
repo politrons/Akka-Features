@@ -21,13 +21,13 @@ object BackPressureClient extends App {
 
   Source(0 to 20)
     .via(flow)
-    .to(Sink.foreach(pair => println(s"Response number ${pair._1} value ${pair._2}")))
+    .to(Sink.foreach(pair => println(s"#################### Response message:${pair._1} status:${pair._2.statusCode}")))
     .run()
 
   def flow = Flow[Int]
-    .map(resNumber => {
-      println(s"Sending request $resNumber")
-      resNumber
+    .map(message => {
+      println(s"Sending message $message")
+      message
     })
     .flatMapMerge(4, resNumber => Source.single(client(request))
       .map(future => processResponse(resNumber, future)))
