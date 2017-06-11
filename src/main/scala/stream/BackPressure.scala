@@ -1,14 +1,16 @@
 package stream
 
+import java.util.UUID
+
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import org.junit.Test
 import org.reactivestreams.Subscriber
 
-import scala.concurrent.Await
 import scala.concurrent.duration._
-
+import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by pabloperezgarcia on 28/01/2017.
@@ -18,7 +20,7 @@ import scala.concurrent.duration._
   */
 class BackPressure {
 
-  implicit val system = ActorSystem()
+  implicit val system = ActorSystem(UUID.randomUUID().toString)
   implicit val materializer = ActorMaterializer()
 
   @Test
@@ -40,6 +42,7 @@ class BackPressure {
     Source(1 to 10)
       .to(Sink.fromSubscriber(function.apply()))
       .run()
+    Thread.sleep(60000)
   }
 
   /**
@@ -52,7 +55,12 @@ class BackPressure {
     () =>
       val source = Source.asSubscriber[Int]
         .buffer(1, OverflowStrategy.backpressure)
-        .map(value => value)
+        .mapAsync(10) { value =>
+          Thread.sleep(1000)
+          Future {
+            value
+          }
+        }
       val sink = Sink.foreach(Console.println)
       source to sink run()
   }
@@ -66,7 +74,12 @@ class BackPressure {
     () =>
       val source = Source.asSubscriber[Int]
         .buffer(1, OverflowStrategy.dropHead)
-        .map(value => value)
+        .mapAsync(10) { value =>
+          Thread.sleep(1000)
+          Future {
+            value
+          }
+        }
       val sink = Sink.foreach(Console.println)
       source to sink run()
   }
@@ -80,7 +93,12 @@ class BackPressure {
     () =>
       val source = Source.asSubscriber[Int]
         .buffer(1, OverflowStrategy.dropTail)
-        .map(value => value)
+        .mapAsync(10) { value =>
+          Thread.sleep(1000)
+          Future {
+            value
+          }
+        }
       val sink = Sink.foreach(Console.println)
       source to sink run()
   }
