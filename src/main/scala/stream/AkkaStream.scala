@@ -31,20 +31,19 @@ class AkkaStream {
 
   @Test def sourceToFlowToSink(): Unit = {
 
-    val sink = Sink.foreach(println)
+    val source = Source(List("Akka", "Kafka", "Afakka", "Kakfta"))
 
     val flow = Flow[String]
-      .map(s => s.toUpperCase)
-      .filter(_.contains("AKKA"))
+      .map(word => word.toUpperCase)
+      .filter(word => word.contains("AKKA"))
 
-    val source = Source(List("Akka", "Kafka", "Afakka", "Kakfta"))
+    val sink = Sink.foreach(println)
 
     source via flow to sink run()
 
     //Just to wait for the end of the execution
     Thread.sleep(1000)
   }
-
 
   /**
     * Flow is normally the glue between Source and sink, in Flow we define some operators where our items will pass over
@@ -54,7 +53,7 @@ class AkkaStream {
   @Test def flow(): Unit = {
     val doubleFlow = Flow[Int]
       .map(_ * 2)
-      .filter(value => value < 10)
+      .filter(_ < 10)
     Await.ready(Source(0 to 10)
       .via(doubleFlow)
       .runWith(Sink.foreach(value => println(value))), 5 seconds)
@@ -238,6 +237,33 @@ class AkkaStream {
     //Just to wait for the end of the execution
     Thread.sleep(1000)
   }
+
+  /**
+    * One of the most important things about akka stream is how easy is create a DSL for user than can be reuse in their
+    * applications, we just need to provide some lego pieces and they just need to put it together
+    */
+  @Test def generateDSL(): Unit = {
+
+    val year =2017
+    transactions via filterTransactionBefore(year) to report(s"Transaction before $year") run()
+
+    //Just to wait for the end of the execution
+    Thread.sleep(5000)
+  }
+
+  type Transaction = (Int, String)
+
+  val transactions = Source(List((2014, "Coca-cola"),
+    (2012, "Levis"),
+    (2016, "Burrito"),
+    (2008, "M&M"),
+    (2005, "Playstation 2"),
+    (2017, "Playstation 4")))
+
+  def filterTransactionBefore(year: Int) = Flow[Transaction]
+    .filter(transaction => transaction._1 < year)
+
+  def report(name: String) = Sink.foreach[Transaction](transaction => println(s"Report $name ${transaction._2}"))
 
   private def separatorFunction = {
     () => "******************+"
