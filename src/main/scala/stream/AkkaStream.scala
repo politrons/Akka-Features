@@ -17,12 +17,12 @@ import scala.concurrent.{Await, ExecutionContext, Future}
   * have back-pressure mechanism which will prevent OutOfMemory problems in our system
   *
   * In Akka Stream we have three elements:
-  *     [Source]~>[Flow]~>[Sink]
+  * [Source]~>[Flow]~>[Sink]
   *
-  *     Source: Origin of data, it could be multiple inputs
-  *     Flow: This part of the stream is where we transform the data that we introduce in our pipeline
-  *     Sink: This is where we receive all data once that has been processed in order to be printed,
-  *     passed to another source and so once with "via"
+  * Source: Origin of data, it could be multiple inputs
+  * Flow: This part of the stream is where we transform the data that we introduce in our pipeline
+  * Sink: This is where we receive all data once that has been processed in order to be printed,
+  * passed to another source and so once with "via"
   */
 class AkkaStream {
 
@@ -30,17 +30,16 @@ class AkkaStream {
   implicit val materializer = ActorMaterializer()
 
   @Test def sourceToFlowToSink(): Unit = {
+
     val sink = Sink.foreach(println)
 
     val flow = Flow[String]
-      .alsoTo(Sink.foreach(s => println(s"Input:$s")))
       .map(s => s.toUpperCase)
       .filter(_.contains("AKKA"))
 
     val source = Source(List("Akka", "Kafka", "Afakka", "Kakfta"))
-      .via(flow)
 
-    source to sink run()
+    source via flow to sink run()
 
     //Just to wait for the end of the execution
     Thread.sleep(1000)
@@ -219,6 +218,25 @@ class AkkaStream {
       .map(_.toString)
       .intersperse("Start", separatorFunction.apply(), "End")
       .runForeach(list => println(s"List:$list")), 5 seconds)
+  }
+
+  /**
+    * Operator that allow us to redirect the flow to another sink but still continue with the flow of the stream
+    */
+  @Test def alsoTo(): Unit = {
+    val sink = Sink.foreach(println)
+
+    val flow = Flow[String]
+      .alsoTo(Sink.foreach(s => println(s"Input:$s")))
+      .map(s => s.toUpperCase)
+      .filter(_.contains("AKKA"))
+
+    val source = Source(List("Akka", "Kafka", "Afakka", "Kakfta"))
+
+    source via flow to sink run()
+
+    //Just to wait for the end of the execution
+    Thread.sleep(1000)
   }
 
   private def separatorFunction = {
