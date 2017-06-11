@@ -88,7 +88,6 @@ class AkkaStream {
       .runForeach(item => println(s"Item:$item")), 5 seconds)
   }
 
-
   /**
     * FlatMapMerge works like flatMap in Rx all source run in parallel.
     * Once that finish all source flatMap merge all results.
@@ -111,9 +110,7 @@ class AkkaStream {
   @Test def zipWith(): Unit = {
     val sources: Seq[Source[Char, _]] = Seq(Source("h"), Source("e"), Source("l"), Source("l"), Source("o"))
     Await.ready(Source.zipN[Char](sources)
-      .map(vector => vector.toStream
-        .scan(new String)((b, b1) => mergeCharacters(b, b1))
-        .last)
+      .map(vector => vector.scan(new String)((b, b1) => mergeCharacters(b, b1)).last).async
       .runForeach(word => println(word)), 5 seconds)
   }
 
@@ -122,14 +119,33 @@ class AkkaStream {
   }
 
   /**
+    * Adding async operator after another operator mark that all previous operator of the pipeline
+    * must be executed in another thread, then the sink(subscriber) will consume the events in the main thread.
+    */
+  @Test def async(): Unit = {
+    Source(0 to 10)
+      .map(value => {
+        println(s"Execution 1 ${Thread.currentThread().getName}")
+        value * 100
+      })
+      .map(value => {
+        println(s"Execution 2 ${Thread.currentThread().getName}")
+        value * 100
+      }).async
+      .runWith(Sink.foreach(value => println(s"Item emitted:$value in Thread:${Thread.currentThread().getName}")))
+
+    Thread.sleep(10000)
+  }
+
+  /**
     * Tick operator is like interval in Rx it will repeat the emittion of item with an initial delay
     * and an internal delay
     */
   @Test def tick(): Unit = {
-    Source.tick(0 seconds, 1 seconds, "Tick")
+    val runnableGraph = Source.tick(0 seconds, 1 seconds, "Tick")
       .map(value => value.toUpperCase)
       .to(Sink.foreach(value => println(s"item emitted:$value")))
-      .run()
+    runnableGraph.run()
   }
 
   /**
@@ -244,7 +260,7 @@ class AkkaStream {
     */
   @Test def generateDSL(): Unit = {
 
-    val year =2017
+    val year = 2017
     transactions via filterTransactionBefore(year) to report(s"Transaction before $year") run()
 
     //Just to wait for the end of the execution
