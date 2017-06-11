@@ -138,6 +138,19 @@ class AkkaStream {
   }
 
   /**
+    * The way to get the value of the source onces start emitting (run) it´s made by lazy operator, which inside
+    * we need to pass a function with the Source that we want to create
+    */
+  @Test def defer(): Unit = {
+    var range = 0 to 10
+    val graphs = Source.lazily(() => Source(range))
+      .to(Sink.foreach(println))
+    range = 10 to 20
+    graphs.run()
+    Thread.sleep(2000)
+  }
+
+  /**
     * Tick operator is like interval in Rx it will repeat the emittion of item with an initial delay
     * and an internal delay
     */
