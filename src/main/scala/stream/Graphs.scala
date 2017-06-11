@@ -1,7 +1,7 @@
 package stream
 
 import akka.actor.ActorSystem
-import akka.stream.scaladsl.{Flow, GraphDSL, Merge, Partition, RunnableGraph, Sink, Source}
+import akka.stream.scaladsl.{Flow, GraphDSL, Partition, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ClosedShape}
 
 /**
@@ -12,50 +12,37 @@ object Graphs extends App {
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
 
-  //  def partitionFunction(i: Int): Int = if (i % 2 == 0) 0 else 1
-  //
-  //  val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
-  //    import GraphDSL.Implicits._
-  //
-  //    val in = Source(1 to 10)
-  //
-  //    val out = Sink.foreach[Int](println)
-  //
-  //    val addOne = Flow[Int].map(_ + 1)
-  //
-  //    val partition = builder.add(Partition[Int](2, partitionFunction))
-  //
-  //    val merge = builder.add(Merge[Int](2))
-  //
-  //    in ~> merge ~> partition
-  //    partition.out(0) ~> addOne ~> merge
-  //    partition.out(1) ~> out
-  //
-  //    ClosedShape
-  //  })
+  def partitionFunction(x: Any): Int = if (x.isInstanceOf[String]) 0 else 1
 
-  def partitionFunction2(x: Any): Int = if (x.isInstanceOf[String]) 0 else 1
+  def wordContainsCharacter(x: String): Int = if (x.contains("*")) 0 else 1
 
-  val r = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
+
+  val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
     import GraphDSL.Implicits._
 
-    val in = Source(List("a", 1, "c", "f", 2, "k", 3,"o","k"))
+    val in = Source(List("hello", 1, "*akka*", "graph", "*world*", 2, 3, 4, "!"))
+
+    val log = Sink.foreach[Any](x => println(s"######## $x"))
 
     val out = Sink.foreach[Any](println)
 
     val toUpperCase = Flow[Any].map(_.asInstanceOf[String].toUpperCase)
 
-    val partition = builder.add(Partition[Any](2, partitionFunction2))
+    val removeCharacter = Flow[String].map(_.replace("*", ""))
 
-    val merge = builder.add(Merge[Any](2))
+    val isNumeric = builder.add(Partition[Any](2, partitionFunction))
 
-                  in ~> merge ~> partition
-    partition.out(0) ~> toUpperCase ~> merge
-    partition.out(1) ~> out
+    val contains = builder.add(Partition[String](2, wordContainsCharacter))
+
+    in ~> isNumeric
+          isNumeric.out(0) ~> toUpperCase ~> contains
+          isNumeric.out(1) ~> out
+                                             contains.out(0) ~> removeCharacter ~> log
+                                             contains.out(1) ~> log
 
     ClosedShape
   })
 
 
-  r.run()
+  runnableGraph.run()
 }
