@@ -29,13 +29,19 @@ object Graphs extends App {
       }
     }
 
-  def wordContainsFunction(x: String): Int = if (x.contains("*")) 0 else 1
+  def checkWordFunction(x: String): Int ={
+    x match {
+      case s:String if s.contains("-") =>1
+      case s:String if s.contains("*") =>2
+      case _ => 0
+    }
+  }
 
 
   val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
     import GraphDSL.Implicits._
 
-    val list = Source(List("hello", 1, "*akka*", "graph", "*world*", 2, "",  4, "!"))
+    val list = Source(List("hello", 1, "*akka*", "-graph-", "*world*", 2, "",  4, "!"))
 
     val printWarning = Sink.foreach[Any](x => println(s"Dont use empty man!"))
 
@@ -45,18 +51,21 @@ object Graphs extends App {
 
     val toUpperCase = Flow[Any].map(_.asInstanceOf[String].toUpperCase)
 
+    val toLowerCase = Flow[Any].map(_.asInstanceOf[String].toLowerCase)
+
     val removeCharacter = Flow[String].map(_.replace("*", "|"))
 
     val isNumeric = builder.add(Partition[Any](3, isNumericFunction))
 
-    val contains = builder.add(Partition[String](2, wordContainsFunction))
+    val contains = builder.add(Partition[String](3, checkWordFunction))
 
     list ~> isNumeric
             isNumeric.out(0) ~> printWarning
             isNumeric.out(1) ~> toUpperCase ~> contains
             isNumeric.out(2) ~> printNumber
-                                               contains.out(0) ~> removeCharacter ~> printWord
-                                               contains.out(1) ~> printWord
+                                               contains.out(0) ~> printWord
+                   printWord <~ toLowerCase <~ contains.out(1)
+                                               contains.out(2) ~> removeCharacter ~> printWord
 
     ClosedShape
   })
