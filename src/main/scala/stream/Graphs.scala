@@ -37,23 +37,23 @@ object Graphs extends App {
     }
   }
 
+  val list = Source(List("hello", 1, "*akka*", "-graph-", "*world*", 2, "",  4, "!"))
+
+  val printWarning = Sink.foreach[Any](x => println(s"Dont use empty man!"))
+
+  val printWord = Sink.foreach[Any](x => println(s"######## $x"))
+
+  val printNumber = Sink.foreach[Any](println)
+
+  val toUpperCase = Flow[Any].map(_.asInstanceOf[String].toUpperCase)
+
+  val toLowerCase = Flow[Any].map(_.asInstanceOf[String].toLowerCase)
+
+  val removeCharacter = Flow[String].map(_.replace("*", "|"))
+
+  import GraphDSL.Implicits._
 
   val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
-    import GraphDSL.Implicits._
-
-    val list = Source(List("hello", 1, "*akka*", "-graph-", "*world*", 2, "",  4, "!"))
-
-    val printWarning = Sink.foreach[Any](x => println(s"Dont use empty man!"))
-
-    val printWord = Sink.foreach[Any](x => println(s"######## $x"))
-
-    val printNumber = Sink.foreach[Any](println)
-
-    val toUpperCase = Flow[Any].map(_.asInstanceOf[String].toUpperCase)
-
-    val toLowerCase = Flow[Any].map(_.asInstanceOf[String].toLowerCase)
-
-    val removeCharacter = Flow[String].map(_.replace("*", "|"))
 
     val isNumeric = builder.add(Partition[Any](3, isNumericFunction))
 
@@ -69,7 +69,6 @@ object Graphs extends App {
 
     ClosedShape
   })
-
 
   runnableGraph.run()
 }
