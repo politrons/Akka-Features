@@ -1,8 +1,7 @@
-package stream
+package stream.dsl
 
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.{Flow, GraphDSL, RunnableGraph, Sink, Source}
-import akka.stream.{ActorMaterializer, ClosedShape}
+import akka.stream.ClosedShape
+import akka.stream.scaladsl.{GraphDSL, RunnableGraph}
 
 /**
   * Created by pabloperezgarcia on 11/06/2017.
@@ -16,16 +15,7 @@ import akka.stream.{ActorMaterializer, ClosedShape}
   *
   * All the operators created, Source, Flow and Sink can be plugged together in this DSL using ~> <~ in any direction.
   */
-object TestDSL extends App {
-
-  implicit val system = ActorSystem()
-  implicit val materializer = ActorMaterializer()
-
-  def Given(sentence: String) = Source.single(sentence.toUpperCase)
-
-  def When(sentence: String) = Flow[Any].map(x => x.asInstanceOf[String].replace("_", " "))
-
-  def Then(sentence: String) = Sink.foreach[String](x => println(s"######## $x"))
+object TestDSL extends MainDSL with App{
 
   import GraphDSL.Implicits._
 

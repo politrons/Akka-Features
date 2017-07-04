@@ -39,7 +39,7 @@ Most common features of Akka ecosystem of lightbend
     * [Subscriber](src/main/scala/stream/Subscriber.scala)
     * [Back-pressure](src/main/scala/stream/BackPressure.scala)
     * [GraphDSL](src/main/scala/stream/Graphs.scala)
-    * [TestDSL](src/main/scala/stream/TestDSL.scala)
+    * [TestDSL](src/main/scala/stream/dsl/TestDSL.scala)
 
 
 
