@@ -15,13 +15,17 @@ import akka.stream.scaladsl.{GraphDSL, RunnableGraph}
   *
   * All the operators created, Source, Flow and Sink can be plugged together in this DSL using ~> <~ in any direction.
   */
-object TestDSL extends MainDSL with App{
-
-  import GraphDSL.Implicits._
+object TestDSL extends MainDSL with App {
 
   val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
 
-    Given("This_is_a_hello_world") ~> When(s"I change character _") ~> Then("I expect to receive 200")
+    import GraphDSL.Implicits._
+
+    init(builder)
+
+    Given("This_is_a_hello_world") ~> When(s"I change character _") ~> \
+
+    \.out(0) ~> AndThen("I expect to receive 200") ~> Then("I expect to receive 200")
 
     ClosedShape
   })
