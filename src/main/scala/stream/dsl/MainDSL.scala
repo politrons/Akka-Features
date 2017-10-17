@@ -12,13 +12,18 @@ class MainDSL {
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
 
+  //    val in = builder.add(Flow[String].map(x => x)).in
+  //    val out = builder.add(Flow[String].map(x => x)).out
+
+  type message = (String, String)
+
   var builder: Builder[NotUsed] = _
 
   def init(b: Builder[NotUsed]) = builder = b
 
-  def Given(sentence: String) = Source.single(sentence.toUpperCase)
+  def Given(sentence: String) = Source.single(new message(sentence.toUpperCase, " "))
 
-  def When(sentence: String) = Flow[String].map(x => x.replace("_", " "))
+  def When(sentence: String) = Flow[message].map(x => x._1.replace("_", x._2))
 
   def Then(sentence: String) = Sink.foreach[String](x => println(s"######## $x"))
 

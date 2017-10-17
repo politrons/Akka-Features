@@ -298,4 +298,23 @@ class AkkaStream {
     () => "******************+"
   }
 
+  /**
+    * Using mapAsync operator, we pass a function which return a Future, the number of parallel run futures will
+    * be determine by the argument passed to the operator.
+    */
+  @Test def readAsync(): Unit = {
+    Source(0 to 10)//-->Your files
+      .mapAsync(5) { value => //-> It will run in parallel 5 reads
+        implicit val ec: ExecutionContext = ActorSystem().dispatcher
+        Future {
+          //Here read your file
+          Thread.sleep(500)
+          println(s"Process in Thread:${Thread.currentThread().getName}")
+          value
+        }
+      }
+      .runWith(Sink.foreach(value => println(s"Item emitted:$value in Thread:${Thread.currentThread().getName}")))
+  }
+
+
 }

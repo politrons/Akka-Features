@@ -1,6 +1,7 @@
 package stream.dsl
 
 import akka.stream.ClosedShape
+import akka.stream.scaladsl.GraphDSL.Implicits._
 import akka.stream.scaladsl.{GraphDSL, RunnableGraph}
 
 /**
@@ -17,9 +18,7 @@ import akka.stream.scaladsl.{GraphDSL, RunnableGraph}
   */
 object TestDSL extends MainDSL with App {
 
-  val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
-
-    import GraphDSL.Implicits._
+  RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
 
     init(builder)
 
@@ -28,7 +27,9 @@ object TestDSL extends MainDSL with App {
     \.out(0) ~> AndThen("I expect to receive 200") ~> Then("I expect to receive 200")
 
     ClosedShape
-  })
 
-  runnableGraph.run()
+  }).run()
+
 }
+
+

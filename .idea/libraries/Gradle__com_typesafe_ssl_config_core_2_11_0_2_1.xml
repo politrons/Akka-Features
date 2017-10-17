@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.typesafe:ssl-config-core_2.11:0.2.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.typesafe/ssl-config-core_2.11/0.2.1/3d2e6a36a7427d6f9d3921c91d6ac1f57dc47b57/ssl-config-core_2.11-0.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.typesafe/ssl-config-core_2.11/0.2.1/c5a33d3df03bc43c46282b75328e7578df6fdf17/ssl-config-core_2.11-0.2.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
