@@ -5,7 +5,6 @@ Author  Pablo Perez Garcia
 
 Most common features of Akka ecosystem of lightbend
 
-
 * **Actors**
 
     ![My image](src/main/resources/img/akkaActor.png)
@@ -21,6 +20,10 @@ Most common features of Akka ecosystem of lightbend
     * [Typed](src/main/scala/typed_actor)
     
     To run test execution [Here](src/main/scala/Runner.scala)
+
+* **Akka typed**
+
+    * [Akka typed](src/main/scala/typed/AkkaTyped.scala)
 
 * **Persistence**
 
