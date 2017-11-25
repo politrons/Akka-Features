@@ -16,14 +16,16 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by pabloperezgarcia on 25/11/2017.
   *
-  * Using the new feature of akka 2.5.6 Akka typed we can forget about have to cast in runtime what the
-  * actor send back using ask pattern.
+  * Using the new feature of akka 2.5.6 Akka typed[https://doc.akka.io/docs/akka/2.5.6/scala/typed.html]
+  * we can forget about have to cast in runtime what the actor send back using ask pattern.
   *
   * Since we send in the message the actorRef of myself specifying, and in the case class of the actor that receive the message
   * we set type of message that I expect to receive back, there´s no need for more casting in the Future response type.
   *
   * Here for instance sending to the same actor system three different message with a different type
   * in the actorRef defined in the case class of the actor, my sender know which type of value it will be returned with the future.
+  *
+  * This a very good pattern to use CQRS for Command/events
   */
 class AkkaTyped {
 
@@ -36,7 +38,7 @@ class AkkaTyped {
   @Test
   def buyProducts(): Unit = {
 
-    val add1: Future[String] = system ? (AddProduct("coca-cola", _))
+    val add1: Future[String] = system ? (AddProduct("coca-cola", _)) //If the type in the case class does not match it wont compile
     val add2: Future[String] = system ? (AddProduct("pepsi", _))
     val add3: Future[String] = system ? (AddProduct("cornflakes", _))
     val remove1: Future[String] = system ? (RemoveProduct("pepsi", _))
@@ -53,7 +55,7 @@ class AkkaTyped {
 
     trait Product
 
-    final case class AddProduct(product: String, replyTo: ActorRef[String]) extends Product
+    final case class AddProduct(product: String, replyTo: ActorRef[String]) extends Product //In the ActorRef we specify the type
 
     final case class RemoveProduct(product: String, replyTo: ActorRef[String]) extends Product
 
