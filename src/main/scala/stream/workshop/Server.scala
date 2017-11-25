@@ -12,7 +12,7 @@ object Server extends App {
 
   def service = Service.mk[Request, Response] { r: Request => {
     println(s"Processing request.......")
-    Thread.sleep(5000)
+    Thread.sleep(2000)
     val rep = Response()
     rep.setContentString(
       s"""

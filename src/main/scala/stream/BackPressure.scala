@@ -8,9 +8,9 @@ import akka.stream.{ActorMaterializer, OverflowStrategy}
 import org.junit.Test
 import org.reactivestreams.Subscriber
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by pabloperezgarcia on 28/01/2017.

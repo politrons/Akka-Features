@@ -1,7 +1,7 @@
 package actor_system.actor
 
-import akka.actor.Actor
 import actor_system.message.AllResultMsg
+import akka.actor.Actor
 
 /**
   * Created by pabloperezgarcia on 18/12/2016.
@@ -16,7 +16,7 @@ class Listener extends Actor {
       println("=====================================")
       println("All result message %s in %s".format(allResult, duration))
       println("=====================================")
-      context.system.shutdown()
+      context.system.stop(self)
   }
 
 }

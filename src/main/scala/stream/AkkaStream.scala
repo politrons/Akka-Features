@@ -123,7 +123,7 @@ class AkkaStream {
     * must be executed in another thread, then the sink(subscriber) will consume the events in the main thread.
     */
   @Test def async(): Unit = {
-    Source(0 to 10)
+    val runWith = Source(0 to 10)
       .map(value => {
         println(s"Execution 1 ${Thread.currentThread().getName}")
         value * 100
@@ -133,6 +133,7 @@ class AkkaStream {
         value * 100
       }).async
       .runWith(Sink.foreach(value => println(s"Item emitted:$value in Thread:${Thread.currentThread().getName}")))
+    runWith
 
     Thread.sleep(10000)
   }
