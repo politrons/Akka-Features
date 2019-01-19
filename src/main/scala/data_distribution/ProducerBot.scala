@@ -28,7 +28,6 @@ import scala.concurrent.duration._
 
 class ProducerBot extends Actor with ActorLogging {
 
-  val replicator: ActorRef = DistributedData(context.system).replicator
 
   implicit val node = Cluster(context.system)
 
@@ -40,7 +39,10 @@ class ProducerBot extends Actor with ActorLogging {
 
   val DataKey: ORSetKey[String] = ORSetKey[String]("uniqueKey")
 
+  val replicator: ActorRef = DistributedData(context.system).replicator
+
   replicator ! Subscribe(DataKey, self)
+
 
   /**
     * In Akka cluster distributed data we can write the changes in different ways:

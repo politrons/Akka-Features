@@ -15,11 +15,12 @@ import akka.cluster.ddata.{DistributedData, ORSetKey}
   */
 class ConsumerBot(name:String) extends Actor with ActorLogging {
 
-  val replicator: ActorRef = DistributedData(context.system).replicator
 
   implicit val node = Cluster(context.system)
 
   val DataKey: ORSetKey[String] = ORSetKey[String]("uniqueKey")
+
+  val replicator: ActorRef = DistributedData(context.system).replicator
 
   replicator ! Subscribe(DataKey, self)
 
