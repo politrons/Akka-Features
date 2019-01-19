@@ -1,5 +1,6 @@
 package stream
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
@@ -304,17 +305,42 @@ class AkkaStream {
     * be determine by the argument passed to the operator.
     */
   @Test def readAsync(): Unit = {
-    Source(0 to 10)//-->Your files
+    Source(0 to 10) //-->Your files
       .mapAsync(5) { value => //-> It will run in parallel 5 reads
-        implicit val ec: ExecutionContext = ActorSystem().dispatcher
-        Future {
-          //Here read your file
-          Thread.sleep(500)
-          println(s"Process in Thread:${Thread.currentThread().getName}")
-          value
-        }
+      implicit val ec: ExecutionContext = ActorSystem().dispatcher
+      Future {
+        //Here read your file
+        Thread.sleep(500)
+        println(s"Process in Thread:${Thread.currentThread().getName}")
+        value
       }
+    }
       .runWith(Sink.foreach(value => println(s"Item emitted:$value in Thread:${Thread.currentThread().getName}")))
+  }
+
+
+  @Test def pipeline(): Unit = {
+
+    val source = Source[String](List("Hello", "Akka", "foo", "Stream"))
+
+    val flow = Flow[String]
+      .delay(100 millis)
+      .filter(word => word != "foo")
+      .map(s => s.toUpperCase)
+      .recover[String]({
+      case _ => "Error processing element in pipeline"
+    })
+
+    val sink: Sink[String, Future[Done]] =
+      Sink.foreach(word => println(s"Item emitted:$word"))
+
+    source
+      .via(flow)
+      .runWith(sink)
+
+    //Just to wait for the end of the execution
+    Thread.sleep(1000)
+
   }
 
 

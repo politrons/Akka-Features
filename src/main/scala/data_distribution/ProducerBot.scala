@@ -1,13 +1,14 @@
 package data_distribution
 
 
-import java.util.concurrent.ThreadLocalRandom
+import java.util
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Cancellable}
 import akka.cluster.Cluster
 import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata.{DistributedData, ORSet, ORSetKey}
 
+import scala.collection.mutable
 import scala.concurrent.duration._
 
 /**
@@ -35,6 +36,8 @@ class ProducerBot extends Actor with ActorLogging {
 
   val tickTask: Cancellable = context.system.scheduler.schedule(5.seconds, 5.seconds, self, "Tick")
 
+  val queue = new util.ArrayDeque(util.Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13))
+
   val DataKey: ORSetKey[String] = ORSetKey[String]("uniqueKey")
 
   replicator ! Subscribe(DataKey, self)
@@ -49,16 +52,20 @@ class ProducerBot extends Actor with ActorLogging {
     */
   def receive = {
     case "Tick" =>
-      val randomElement = ThreadLocalRandom.current().nextInt(97, 123).toChar.toString
-      log.info("Producer adding: {}", randomElement)
-      replicator ! Update(DataKey, ORSet.empty[String], WriteAll(5 seconds))(_ + randomElement)
-
+      //      val randomElement = ThreadLocalRandom.current().nextInt(97, 123).toChar.toString
+      val data = queue.poll()
+      log.info("Producer sending: {}", data)
+      replicator ! Update(DataKey, ORSet.empty[String], WriteAll(5 seconds))(previous => {
+        //We should persist previous in akka persistence
+        previous.clear(node) //Clean the old history of send
+        ORSet.empty + data.toString
+      })
     case _: UpdateResponse[_] => //Ignore
 
     //This case will get all changes in the ORSetKey
-    case element @Changed(DataKey) =>
-      val data = element.get(DataKey)
-      log.info("Producer elements: {}", data.elements)
+    case replicatorMessage@Changed(DataKey) =>
+      val data = replicatorMessage.get(DataKey)
+    //      data.clear(node)
   }
 
   override def postStop(): Unit = tickTask.cancel()

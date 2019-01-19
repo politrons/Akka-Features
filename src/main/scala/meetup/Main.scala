@@ -43,7 +43,6 @@ object Main extends App {
       |}
     """.stripMargin))
 
-
   private val barajasRef: ActorRef =
     system.actorOf(Props[Barajas]
       .withDispatcher("my-dispatcher")

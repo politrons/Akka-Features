@@ -13,7 +13,7 @@ import akka.cluster.ddata.{DistributedData, ORSetKey}
   *
   * http://doc.akka.io/docs/akka/2.4.16/scala/distributed-data.html
   */
-class ConsumerBot extends Actor with ActorLogging {
+class ConsumerBot(name:String) extends Actor with ActorLogging {
 
   val replicator: ActorRef = DistributedData(context.system).replicator
 
@@ -27,10 +27,9 @@ class ConsumerBot extends Actor with ActorLogging {
 
     case _: UpdateResponse[_] => //ignore
 
-    case c@Changed(DataKey) =>
-      val data = c.get(DataKey)
-      log.info("Consumer elements: {}", data.elements)
-
+    case replicatorMessage@Changed(DataKey) =>
+      val data = replicatorMessage.get(DataKey)
+      log.info(s"$name: {}", data.elements)
   }
 
 }
