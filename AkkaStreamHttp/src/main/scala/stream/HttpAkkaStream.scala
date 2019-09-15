@@ -42,7 +42,6 @@ object HttpAkkaStream extends App {
 
   //  ROUTES
   //#############
-
   /**
     * Function where we define all routes of our service.
     *
