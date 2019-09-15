@@ -29,11 +29,13 @@ object HttpAkkaStream extends App {
 
   /**
     * We create the request data for the POST request,
-    * and also the Json format from Spray library, that we use as implicit conversion to transform a json entry to Data type.
     */
-
   case class UserDataType(id: Int, name: String, age: Int, sex: String)
 
+  /**
+    * Json format from Spray library, that we use as implicit conversion to transform a json entry to Data type.
+    * We have to use the operator [jsonFormatX] where [X] is the number of arguments of your Data type.
+    */
   implicit val requestDataJsonFormat: RootJsonFormat[UserDataType] = jsonFormat4(UserDataType.apply)
 
   var users = Map[Int, UserDataType]()
@@ -56,17 +58,19 @@ object HttpAkkaStream extends App {
     */
   private def getRoutes: Route = {
 
-  implicit val jsonStreamingSupport: JsonEntityStreamingSupport = EntityStreamingSupport.json()
+    implicit val jsonStreamingSupport: JsonEntityStreamingSupport = EntityStreamingSupport.json()
 
-    post {
-      entity(asSourceOf[UserDataType]) { source =>
-        complete {
-          source
-            .runFold(users)((users, user) => {
-              users == users ++ Map(user.id -> user)
-              println(s"New user ${user.name} added")
-              users
-            }).map(users => s"total number of users in system ${users.size}")
+    path("requestStream") {
+      post {
+        entity(asSourceOf[UserDataType]) { source =>
+          complete {
+            source
+              .runFold(users)((users, user) => {
+                users == users ++ Map(user.id -> user)
+                println(s"New user ${user.name} added")
+                users
+              }).map(users => s"total number of users in system ${users.size}")
+          }
         }
       }
     }
