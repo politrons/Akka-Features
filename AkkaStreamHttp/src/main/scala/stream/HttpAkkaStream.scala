@@ -38,14 +38,19 @@ object HttpAkkaStream extends App {
 
   var users = Map[Int, UserDataType]()
 
+  //  ROUTES
+  //#############
+
   /**
     * Function where we define all routes of our service.
+    *
     * We are able to use [asSourceOf] function which thanks to implicit [EntityStreamingSupport]
-    * which expect a Data type to be able to marshall to Json we are able to transform into Akka [Source]
+    * which expect a json array to chunk into array of Data type [UserDataType] into Akka [Source]
+    *
     * We are able to Marshall from Json to Data type [UserDataType] thanks to implicit conversion RootJsonFormat[UserDataType]
     *
-    * Once we have the Source from our request we can use [runFold] operator to be able to receive the whole json request chunk in
-    * each [UserDataType] entry, to process the whole request as a stream of data.
+    * Once we have the Source from our request we can use [runFold] operator to be able to receive  each [UserDataType] entry,
+    * to process the whole request as a stream of data.
     *
     * @return Route type that it will used by [Http().bindAndHandle] to route request to the proper handler.
     */
