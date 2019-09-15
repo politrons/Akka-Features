@@ -1,8 +1,26 @@
 [
-  {"id": 1, "data": "the first"  },
-  {"id": 2, "data": "the second" },
-  {"id": 3, "data": "the third"  },
-  {"id": 4, "data": "the fourth" },
-  {"id": 5, "data": "the fifth"  },
-  {"id": 6, "data": "the sixth"  }
+  {
+    "id": 1,
+    "name": "Politrons",
+    "age": 38,
+    "sex": "male"
+  },
+  {
+    "id": 2,
+    "name": "Esther",
+    "age": 36,
+    "sex": "female"
+  },
+  {
+    "id": 3,
+    "name": "John",
+    "age": 39,
+    "sex": "male"
+  },
+  {
+    "id": 4,
+    "name": "Ben",
+    "age": 55,
+    "sex": "male"
+  }
 ]
