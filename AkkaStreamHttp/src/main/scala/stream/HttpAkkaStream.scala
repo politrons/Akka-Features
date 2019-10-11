@@ -13,7 +13,7 @@ import akka.util.ByteString
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
 object HttpAkkaStream extends App {
@@ -79,17 +79,29 @@ object HttpAkkaStream extends App {
     }
 
     /**
+      *
+      * In order to get query params we use [parameters] where you use ['] followed by the query name and the type you want to set.
+      * This generate function where we receive the two query params variables.
+      *
+      * Once we receive the request we can define in the complete the output.
+      *
+      * We create the Source using [fromFuture] which allow us make the computation of the request in another Thread.
+      * the arguments we receive form the request, and we use [throttle] to provide back-pressure.
+      *
       * Using [throttle] operator Sends elements downstream with speed limited to `elements/per`. In other words, this stage set the maximum rate
       * for emitting messages.
-      * Backpressures when downstream backpressures or the incoming rate is higher than the speed limit
+      * Backpressures when downstream backpressures or the incoming rate is higher than the speed limit.
+      *
       */
     path("requestStreamGet") {
       get {
-        val sourceOfInformation = Source("Request received")
-          .throttle(elements = 1000, per = 1 second, maximumBurst = 1, mode = ThrottleMode.Shaping)
-          .map(_.toUpper)
-          .map(s => ByteString(s + "\n"))
-        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, sourceOfInformation))
+        parameters('key.as[String], 'value.as[String]) { (key, value) =>
+          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`,
+            Source.fromFuture(Future{s"Request received: Key:$key - value:$value"})
+              .throttle(elements = 1000, per = 1 second, maximumBurst = 1, mode = ThrottleMode.Shaping)
+              .map(value => value.toUpperCase)
+              .map(s => ByteString(s + "\n"))))
+        }
       }
     }
   }
