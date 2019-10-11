@@ -44,8 +44,6 @@ Most common features of Akka ecosystem of lightbend
     * [GraphDSL](src/main/scala/stream/Graphs.scala)
     * [TestDSL](src/main/scala/stream/dsl/TestDSL.scala)
 
-
-
 * **Http**
 
     ![My image](src/main/resources/img/http1.ico)
@@ -53,6 +51,7 @@ Most common features of Akka ecosystem of lightbend
     * [Server](src/main/scala/http/WebServer.scala)
 
     To run test execution [Here](src/main/scala/http/ClientRunner.scala)
+    
 
 * **Distributed Data**
 
@@ -67,4 +66,9 @@ Most common features of Akka ecosystem of lightbend
     ![My image](src/main/resources/img/features.png)
     * [Agent](src/main/scala/features/agents/Agents.scala)
 
+* **Http Stream**
+
+    Example of Akka http server running with Akka Stream together
+    
+    * [Server](src/main/scala/stream)    
 
