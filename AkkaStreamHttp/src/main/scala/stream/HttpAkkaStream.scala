@@ -1,6 +1,6 @@
 package stream
 
-import akka.actor.ActorSystem
+import akka.actor.{Actor, ActorSystem, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.common.{EntityStreamingSupport, JsonEntityStreamingSupport}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
@@ -9,7 +9,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, ThrottleMode}
-import akka.util.ByteString
+import akka.util.{ByteString, Timeout}
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
 
@@ -25,12 +25,13 @@ object HttpAkkaStream extends App {
   implicit val system: ActorSystem = ActorSystem("AkkaStreamHttp")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val ec: ExecutionContext = system.dispatcher
+  implicit val timeout = Timeout(5 seconds)
 
   private val port = 8080
 
   val routes = getRoutes
 
-  Http().bindAndHandle(routes._1 ~ routes._2, "localhost", port)
+  Http().bindAndHandle(routes._1 ~ routes._2 ~ routes._3, "localhost", port)
 
   println(s"Akka Stream Server running in port $port")
 
@@ -59,7 +60,7 @@ object HttpAkkaStream extends App {
     *
     * @return (Route,Route) type that it will used by [Http().bindAndHandle] to route request to the proper handler.
     */
-  private def getRoutes: (Route, Route) = {
+  private def getRoutes: (Route, Route, Route) = {
 
     implicit val jsonStreamingSupport: JsonEntityStreamingSupport = EntityStreamingSupport.json()
 
@@ -109,9 +110,7 @@ object HttpAkkaStream extends App {
       get {
         parameters('key.as[String], 'value.as[String]) { (key, value) =>
           complete(HttpEntity(ContentTypes.`text/html(UTF-8)`,
-            Source.fromFuture(Future {
-              s"Request received: Key:$key - value:$value"
-            })
+            Source.fromFuture(Future(s"Request received: Key:$key - value:$value"))
               .throttle(elements = 1000, per = 1 second, maximumBurst = 1, mode = ThrottleMode.Shaping)
               .flatMapConcat(value => Source.fromFuture(Future(s"$value Concat in another future")))
               .map(value => value.toUpperCase)
@@ -122,6 +121,44 @@ object HttpAkkaStream extends App {
         }
       }
     }
-    (postRoutes, getRoutes)
+
+    /**
+      * Using Source of Akka Stream we can communicate and pass the event emitted in the stream to another actor
+      * using [ask] operator, which expect to receive an actorRef to call it. Since Akka communication here is untyped, we must
+      * specify in the ask operator, the return type of the communication.
+      *
+      * Here we will first send as Message type, and we will receive an String, and then we will send that String, and we will
+      * receive the Message type.
+      *
+      * Since Akka use Future in Ask patter, the communication is completely async.
+      */
+    val akkaRoutes = path("requestStreamActor") {
+      get {
+        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`,
+          Source.fromFuture(Future(s"Request received redirected to Actor:"))
+            .throttle(elements = 1000, per = 1 second, maximumBurst = 1, mode = ThrottleMode.Shaping)
+            .map(message => Message(message))
+            .ask[String](customActor)
+            .ask[Message](customActor)
+            .map(message => ByteString(message.value + "\n"))))
+      }
+    }
+
+    (postRoutes, getRoutes, akkaRoutes)
   }
+
+  // AKKA ACTOR & MESSAGE
+  //#####################
+
+  lazy val customActor = system.actorOf(Props[CustomActor], name = "customAkka")
+
+  case class Message(value: String)
+
+  class CustomActor extends Actor {
+    override def receive: Receive = {
+      case Message(value) => sender() ! s"$value Message process and response from Actor"
+      case value: String => sender() ! Message(value + "!!!")
+    }
+  }
+
 }
