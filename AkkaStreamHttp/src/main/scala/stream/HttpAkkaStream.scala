@@ -4,13 +4,17 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.common.{EntityStreamingSupport, JsonEntityStreamingSupport}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, ThrottleMode}
+import akka.util.ByteString
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
 
 object HttpAkkaStream extends App {
 
@@ -73,6 +77,20 @@ object HttpAkkaStream extends App {
         }
       }
     }
+
+    /**
+      * Using [throttle] operator Sends elements downstream with speed limited to `elements/per`. In other words, this stage set the maximum rate
+      * for emitting messages.
+      * Backpressures when downstream backpressures or the incoming rate is higher than the speed limit
+      */
+    path("requestStreamGet") {
+      get {
+        val sourceOfInformation = Source("Request received")
+          .throttle(elements = 1000, per = 1 second, maximumBurst = 1, mode = ThrottleMode.Shaping)
+          .map(_.toUpper)
+          .map(s => ByteString(s + "\n"))
+        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, sourceOfInformation))
+      }
+    }
   }
 }
-
