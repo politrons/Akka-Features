@@ -16,6 +16,10 @@ import spray.json.RootJsonFormat
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
+/**
+  * POST: To Test just run the Server and run the client.sh which it will run some post request.
+  * GET: To Test just run the server and make a request with some query params (http://localhost:8080/requestStreamGet?key=hello&value=world)
+  */
 object HttpAkkaStream extends App {
 
   implicit val system: ActorSystem = ActorSystem("AkkaStreamHttp")
@@ -24,7 +28,9 @@ object HttpAkkaStream extends App {
 
   private val port = 8080
 
-  Http().bindAndHandle(getRoutes, "localhost", port)
+  val routes = getRoutes
+
+  Http().bindAndHandle(routes._1 ~ routes._2, "localhost", port)
 
   println(s"Akka Stream Server running in port $port")
 
@@ -49,21 +55,24 @@ object HttpAkkaStream extends App {
   /**
     * Function where we define all routes of our service.
     *
-    * We are able to use [asSourceOf] function which thanks to implicit [EntityStreamingSupport]
-    * which expect a json array to chunk into array of Data type [UserDataType] into Akka [Source]
+    * We define routes per http method, where inside we can deifne multiple [paths], and then we return a tuple of routes.
     *
-    * We are able to Marshall from Json to Data type [UserDataType] thanks to implicit conversion RootJsonFormat[UserDataType]
-    *
-    * Once we have the Source from our request we can use [runFold] operator to be able to receive  each [UserDataType] entry,
-    * to process the whole request as a stream of data.
-    *
-    * @return Route type that it will used by [Http().bindAndHandle] to route request to the proper handler.
+    * @return (Route,Route) type that it will used by [Http().bindAndHandle] to route request to the proper handler.
     */
-  private def getRoutes: Route = {
+  private def getRoutes: (Route, Route) = {
 
     implicit val jsonStreamingSupport: JsonEntityStreamingSupport = EntityStreamingSupport.json()
 
-    path("requestStream") {
+    /**
+      * We are able to use [asSourceOf] function which thanks to implicit [EntityStreamingSupport]
+      * which expect a json array to chunk into array of Data type [UserDataType] into Akka [Source]
+      *
+      * We are able to Marshall from Json to Data type [UserDataType] thanks to implicit conversion RootJsonFormat[UserDataType]
+      *
+      * Once we have the Source from our request we can use [runFold] operator to be able to receive  each [UserDataType] entry,
+      * to process the whole request as a stream of data.
+      */
+    val postRoutes = path("requestStream") {
       post {
         entity(asSourceOf[UserDataType]) { source =>
           complete {
@@ -92,17 +101,27 @@ object HttpAkkaStream extends App {
       * for emitting messages.
       * Backpressures when downstream backpressures or the incoming rate is higher than the speed limit.
       *
+      * Once we have out monad Stream we can make transformation as usual using [map] or composition of another [Source] using [flatMapConcat]
+      *
+      * Also we can filter or takeWhile passing predicate functions to follow down to the stream.
       */
-    path("requestStreamGet") {
+    val getRoutes = path("requestStreamGet") {
       get {
         parameters('key.as[String], 'value.as[String]) { (key, value) =>
           complete(HttpEntity(ContentTypes.`text/html(UTF-8)`,
-            Source.fromFuture(Future{s"Request received: Key:$key - value:$value"})
+            Source.fromFuture(Future {
+              s"Request received: Key:$key - value:$value"
+            })
               .throttle(elements = 1000, per = 1 second, maximumBurst = 1, mode = ThrottleMode.Shaping)
+              .flatMapConcat(value => Source.fromFuture(Future(s"$value Concat in another future")))
               .map(value => value.toUpperCase)
+              .flatMapConcat(value => Source.single(value + "!!!"))
+              .filter(value => value.length > 5)
+              .takeWhile(value => value.length < 100)
               .map(s => ByteString(s + "\n"))))
         }
       }
     }
+    (postRoutes, getRoutes)
   }
 }
