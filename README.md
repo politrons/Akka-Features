@@ -70,5 +70,5 @@ Most common features of Akka ecosystem of lightbend
 
     Example of Akka http server running with Akka Stream together
     
-    * [Server](src/main/scala/stream/HttpAkkaStream.scala)    
+    * [Server](AkkaStreamHttp/src/main/scala/stream/HttpAkkaStream.scala)    
 
