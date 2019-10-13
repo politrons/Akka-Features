@@ -7,7 +7,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, ThrottleMode}
 import akka.util.{ByteString, Timeout}
 import spray.json.DefaultJsonProtocol._
@@ -134,14 +134,14 @@ object HttpAkkaStream extends App {
       */
     val akkaRoutes = path("requestStreamActor") {
       get {
-        complete {
-          Source.fromFuture(Future(s"Request received redirected to Actor:"))
-            .throttle(elements = 1000, per = 1 second, maximumBurst = 1, mode = ThrottleMode.Shaping)
-            .map(message => Message(message))
-            .ask[String](customActor)
-            .ask[Message](customActor)
-            .map(message => ByteString(message.value + "\n"))
-        }
+        complete(
+          HttpEntity(ContentTypes.`text/html(UTF-8)`,
+            Source.fromFuture(Future(s"Request received redirected to Actor:"))
+              .throttle(elements = 1000, per = 1 second, maximumBurst = 1, mode = ThrottleMode.Shaping)
+              .map(message => Message(message))
+              .ask[String](customActor)
+              .ask[Message](customActor)
+              .map(message => ByteString(message.value + "\n"))))
       }
     }
 
@@ -157,7 +157,7 @@ object HttpAkkaStream extends App {
 
   class CustomActor extends Actor {
     override def receive: Receive = {
-      case Message(value) => sender() ! s"$value Message process and response from Actor"
+      case Message(value) =>sender() ! s"$value Message process and response from Actor"
       case value: String => sender() ! Message(value + "!!!")
     }
   }
