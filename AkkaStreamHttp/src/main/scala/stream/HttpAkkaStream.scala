@@ -13,8 +13,8 @@ import akka.util.{ByteString, Timeout}
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * POST: To Test just run the Server and run the client.sh which it will run some post request.
