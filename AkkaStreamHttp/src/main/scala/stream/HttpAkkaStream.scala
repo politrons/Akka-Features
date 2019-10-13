@@ -134,13 +134,14 @@ object HttpAkkaStream extends App {
       */
     val akkaRoutes = path("requestStreamActor") {
       get {
-        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`,
+        complete {
           Source.fromFuture(Future(s"Request received redirected to Actor:"))
             .throttle(elements = 1000, per = 1 second, maximumBurst = 1, mode = ThrottleMode.Shaping)
             .map(message => Message(message))
             .ask[String](customActor)
             .ask[Message](customActor)
-            .map(message => ByteString(message.value + "\n"))))
+            .map(message => ByteString(message.value + "\n"))
+        }
       }
     }
 
