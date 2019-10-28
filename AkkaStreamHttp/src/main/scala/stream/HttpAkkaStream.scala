@@ -15,6 +15,7 @@ import spray.json.RootJsonFormat
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Random
 
 /**
   * POST: To Test just run the Server and run the client.sh which it will run some post request.
@@ -147,6 +148,11 @@ object HttpAkkaStream extends App {
 
     (postRoutes, getRoutes, akkaRoutes)
   }
+
+  val numbers = Source.fromIterator(() =>
+    Iterator.continually(Random.nextInt()))
+    .throttle(elements = 1000, per = 1 second, maximumBurst = 1, mode = ThrottleMode.Shaping)
+
 
   // AKKA ACTOR & MESSAGE
   //#####################
