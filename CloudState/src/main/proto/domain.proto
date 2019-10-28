@@ -3,18 +3,18 @@
 
 syntax = "proto3";
 
-package example.shoppingcart.domain;
+package io.cloudstate.shopping.domain;
 
-option java_package = "io.cloudstate.shopping";
+option java_package = "io.cloudstate.shopping.domain";
 
-message Item {
+message LineItem {
     string productId = 1;
     string name = 2;
     int32 quantity = 3;
 }
 
 message ItemAdded {
-    Item item = 1;
+    LineItem item = 1;
 }
 
 message ItemRemoved {
@@ -24,6 +24,6 @@ message ItemRemoved {
 message CheckedOut {}
 
 message Cart {
-    repeated Item items = 1;
+    repeated LineItem items = 1;
     bool checkedout = 2;
 }

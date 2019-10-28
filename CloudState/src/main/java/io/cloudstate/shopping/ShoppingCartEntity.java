@@ -1,9 +1,9 @@
 package io.cloudstate.shopping;
 
 import com.google.protobuf.Empty;
-import io.cloudstate.javasupport.CloudState;
 import io.cloudstate.javasupport.EntityId;
 import io.cloudstate.javasupport.eventsourced.*;
+import io.cloudstate.shopping.domain.Domain;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,20 +15,9 @@ import java.util.stream.Collectors;
 @EventSourcedEntity(persistenceId = "shopping-cart", snapshotEvery = 20)
 public class ShoppingCartEntity {
 
-//    // MAIN
-//
-//    public static void main(String... args) {
-//        new CloudState()
-//                .registerEventSourcedEntity(
-//                        ShoppingCartEntity.class,
-//                        ShoppingProtocol.getDescriptor().findServiceByName("ShoppingCartService"),
-//                        ShoppingDomain.getDescriptor())
-//                .start();
-//    }
-
     private final String entityId;
 
-    private final Map<String, ShoppingProtocol.Item> cart = new LinkedHashMap<>();
+    private final Map<String, Protocol.LineItem> cart = new LinkedHashMap<>();
 
     public ShoppingCartEntity(@EntityId String entityId) {
         this.entityId = entityId;
@@ -38,30 +27,29 @@ public class ShoppingCartEntity {
     //-----------
 
     @CommandHandler
-    public ShoppingProtocol.Cart getCart() {
-        return ShoppingProtocol.Cart.newBuilder().addAllItems(cart.values()).build();
+    public Protocol.Cart getCart() {
+        return Protocol.Cart.newBuilder().addAllItems(cart.values()).build();
     }
 
 
     /**
      * A command handler may emit an event by taking in a CommandContext parameter, and invoking the emit method on it.
      * Invoking emit will immediately invoke the associated event handler for that event
-     *
+     * <p>
      * [ShoppingDomain] is the factory class responsible for the creation of events. Here using for instance [ItemAdded.newBuilder()]
      * we use builder pattern to create a new Event using the command info.
-     *
      *
      * @param item Command to transform into event
      * @param ctx  of command to link the Command and Event Handler.
      * @return Empty
      */
     @CommandHandler
-    public Empty addItem(ShoppingProtocol.AddLineItem item, CommandContext ctx) {
+    public Empty addItem(Protocol.AddLineItem item, CommandContext ctx) {
         if (item.getQuantity() <= 0) {
             ctx.fail("Cannot add negative quantity of to item" + item.getProductId());
         }
-        ctx.emit(ShoppingDomain.ItemAdded.newBuilder()
-                .setItem(ShoppingDomain.Item.newBuilder()
+        ctx.emit(Domain.ItemAdded.newBuilder()
+                .setItem(Domain.LineItem.newBuilder()
                         .setProductId(item.getProductId())
                         .setName(item.getName())
                         .setQuantity(item.getQuantity())
@@ -78,8 +66,8 @@ public class ShoppingCartEntity {
      * the [CommandContext]
      */
     @EventHandler
-    public void itemAdded(ShoppingDomain.ItemAdded itemAdded) {
-        ShoppingProtocol.Item item = cart.get(itemAdded.getItem().getProductId());
+    public void itemAdded(Domain.ItemAdded itemAdded) {
+        Protocol.LineItem item = cart.get(itemAdded.getItem().getProductId());
         if (item == null) {
             item = convert(itemAdded.getItem());
         } else {
@@ -90,8 +78,8 @@ public class ShoppingCartEntity {
         cart.put(item.getProductId(), item);
     }
 
-    private ShoppingProtocol.Item convert(ShoppingDomain.Item item) {
-        return ShoppingProtocol.Item.newBuilder()
+    private Protocol.LineItem convert(Domain.LineItem item) {
+        return Protocol.LineItem.newBuilder()
                 .setProductId(item.getProductId())
                 .setName(item.getName())
                 .setQuantity(item.getQuantity())
@@ -107,14 +95,14 @@ public class ShoppingCartEntity {
      * to ensure that they can be loaded quickly even when they have very long journals
      */
     @Snapshot
-    public ShoppingDomain.Cart snapshot() {
-        return ShoppingDomain.Cart.newBuilder()
+    public Domain.Cart snapshot() {
+        return Domain.Cart.newBuilder()
                 .addAllItems(cart.values().stream().map(this::convert).collect(Collectors.toList()))
                 .build();
     }
 
-    private ShoppingDomain.Item convert(ShoppingProtocol.Item item) {
-        return ShoppingDomain.Item.newBuilder()
+    private Domain.LineItem convert(Protocol.LineItem item) {
+        return Domain.LineItem.newBuilder()
                 .setProductId(item.getProductId())
                 .setName(item.getName())
                 .setQuantity(item.getQuantity())
@@ -127,9 +115,9 @@ public class ShoppingCartEntity {
      * @param cart
      */
     @SnapshotHandler
-    public void handleSnapshot(ShoppingDomain.Cart cart) {
+    public void handleSnapshot(Domain.Cart cart) {
         this.cart.clear();
-        for (ShoppingDomain.Item item : cart.getItemsList()) {
+        for (Domain.LineItem item : cart.getItemsList()) {
             this.cart.put(item.getProductId(), convert(item));
         }
     }

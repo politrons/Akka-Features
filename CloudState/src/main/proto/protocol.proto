@@ -29,12 +29,12 @@ message GetShoppingCart {
     string user_id = 1 [(.cloudstate.entity_key) = true];
 }
 
-message Item {
+message LineItem {
     string product_id = 1;
     string name = 2;
     int32 quantity = 3;
 }
 
 message Cart {
-    repeated Item items = 1;
+    repeated LineItem items = 1;
 }

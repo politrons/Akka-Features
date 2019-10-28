@@ -1,6 +1,7 @@
 package io.cloudstate.shopping;
 
 import io.cloudstate.javasupport.CloudState;
+import io.cloudstate.shopping.domain.Domain;
 
 /**
  * Main class to register the entity created using [CloudState] instance and the [registerEventSourcedEntity]
@@ -12,8 +13,8 @@ public class ShoppingCartMain {
         new CloudState()
                 .registerEventSourcedEntity(
                         ShoppingCartEntity.class,
-                        ShoppingProtocol.getDescriptor().findServiceByName("ShoppingCartService"),
-                        ShoppingDomain.getDescriptor())
+                        Protocol.getDescriptor().findServiceByName("ShoppingCartService"),
+                        Domain.getDescriptor())
                 .start();
     }
 }
