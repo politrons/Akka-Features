@@ -1,9 +1,16 @@
 # CloudState
 
+### Service
+
+You can implement your service using the current DSL.
+
+Here I implement an Event sourcing service using as Data Store the **InMemory** option
+
+[Event sourcing](CloudState/src/main/java/io/cloudstate/shopping/ShoppingCartEntity.java)
     
 ### Docker
 
-* Plugin to Create and push image into docker hub
+* Plugin to Create and push image of the Service into docker hub
 
 ```
 
@@ -46,9 +53,10 @@
             </plugin>    
 ```
 
+    Using in the plugin ``<name>politrons/shopping-cart:%l</name>``` it means it will be publish in my personal docker hub **politrons**
+
 * Create image ``Docker build``
 * Push image ``Docker push``
-
 
 
 ### K8s
@@ -59,7 +67,7 @@
     kubectl create namespace cloudstate
     ```
     
-* Add service description in yaml file
+* Download cloudstate.yaml yaml file that you can find [here](https://github.com/cloudstateio/cloudstate/tags)
     
 
 * Add in the yaml file your service to be deployed

@@ -1,7 +1,10 @@
 package io.cloudstate.shopping;
 
+import com.google.protobuf.Descriptors;
 import io.cloudstate.javasupport.CloudState;
 import io.cloudstate.shopping.domain.Domain;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * Main class to register the entity created using [CloudState] instance and the [registerEventSourcedEntity]
@@ -9,12 +12,18 @@ import io.cloudstate.shopping.domain.Domain;
  */
 public class ShoppingCartMain {
 
-    public static void main(String... args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        Descriptors.ServiceDescriptor shoppingCartService = Protocol.getDescriptor().findServiceByName("ShoppingCartService");
+        Descriptors.FileDescriptor descriptor = Domain.getDescriptor();
+        System.out.println("Protocol descriptor:" + shoppingCartService);
+        System.out.println("Domain descriptor:" + descriptor);
         new CloudState()
                 .registerEventSourcedEntity(
                         ShoppingCartEntity.class,
-                        Protocol.getDescriptor().findServiceByName("ShoppingCartService"),
-                        Domain.getDescriptor())
-                .start();
+                        shoppingCartService,
+                        descriptor)
+                .start()
+                .toCompletableFuture()
+                .get();
     }
 }

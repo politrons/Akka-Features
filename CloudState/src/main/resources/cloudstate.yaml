@@ -1,24 +1,22 @@
-
-apiVersion: v1
-kind: StatefulStore
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
 metadata:
-  name: inmemory
+  name: statefulservices.cloudstate.io
 spec:
-  type: InMemory
+  group: cloudstate.io
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+  scope: Namespaced
+  names:
+    plural: statefulservices
+    singular: statefulservice
+    kind: StatefulService
+  subresources:
+    status: {}
 
 ---
-
-apiVersion: cloudstate.io/v1alpha1
-kind: StatefulService
-metadata:
-  name: shopping-cart
-spec:
-  datastore:
-    name: inmemory
-  containers:
-    - image: politrons/shopping-cart:latest
----
-
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
@@ -37,17 +35,17 @@ spec:
   subresources:
     status: {}
   additionalPrinterColumns:
-  - name: Type
-    type: string
-    description: The type of event sourced Journal
-    JSONPath: .spec.type
-  - name: Service
-    type: string
-    description: The service that serves this journal
-    JSONPath: .spec.config.service
-  - name: Age
-    type: date
-    JSONPath: .metadata.creationTimestamp
+    - name: Type
+      type: string
+      description: The type of event sourced Journal
+      JSONPath: .spec.type
+    - name: Service
+      type: string
+      description: The service that serves this journal
+      JSONPath: .spec.config.service
+    - name: Age
+      type: date
+      JSONPath: .metadata.creationTimestamp
 
 
 ---
@@ -74,9 +72,10 @@ data:
       # Proxy configuration
       proxy {
         image {
-          cassandra = "cloudstateio/cloudstate-proxy-native-cassandra:0.4.3"
-          no-journal = "cloudstateio/cloudstate-proxy-native-no-journal:0.4.3"
-          in-memory = "cloudstateio/cloudstate-proxy-native-in-memory:0.4.3"
+            cassandra = "cloudstateio/cloudstate-proxy-cassandra:dev"
+            postgres =  "cloudstateio/cloudstate-proxy-postgres:dev"
+            no-store = "cloudstateio/cloudstate-proxy-no-store:dev"
+            in-memory = "cloudstateio/cloudstate-proxy-in-memory:dev"
         }
       }
     }
@@ -89,29 +88,29 @@ metadata:
   name: cloudstate-operator-role
 rules:
 
-- apiGroups: [""]
-  resources: ["namespaces"]
-  verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "watch"]
 
-- apiGroups: [""]
-  resources: ["services"]
-  verbs: ["get", "create", "delete", "patch", "update"]
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "create", "delete", "patch", "update"]
 
-- apiGroups: ["apps"]
-  resources: ["deployments", "deployments/scale"]
-  verbs: ["get", "create", "delete", "patch", "update", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "deployments/scale"]
+    verbs: ["get", "create", "delete", "patch", "update", "watch"]
 
-- apiGroups: ["rbac.authorization.k8s.io"]
-  resources: ["rolebindings", "roles"]
-  verbs: ["get", "create", "delete", "patch", "update"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["rolebindings", "roles"]
+    verbs: ["get", "create", "delete", "patch", "update"]
 
-- apiGroups: ["cloudstate.io"]
-  resources: ["journals", "statefulservices"]
-  verbs: ["get", "list", "watch"]
+  - apiGroups: ["cloudstate.io"]
+    resources: ["journals", "statefulservices"]
+    verbs: ["get", "list", "watch"]
 
-- apiGroups: ["cloudstate.io"]
-  resources: ["journals/status", "statefulservices/status"]
-  verbs: ["update", "patch"]
+  - apiGroups: ["cloudstate.io"]
+    resources: ["journals/status", "statefulservices/status"]
+    verbs: ["update", "patch"]
 
 ---
 
@@ -120,10 +119,10 @@ kind: Role
 metadata:
   name: cloudstate-operator-role
 rules:
-- apiGroups: [""]
-  resources: ["configmaps"]
-  verbs: ["get", "watch"]
-  resourceNames: ["cloudstate-operator-config"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "watch"]
+    resourceNames: ["cloudstate-operator-config"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -131,9 +130,9 @@ kind: ClusterRoleBinding
 metadata:
   name: cloudstate-operator
 subjects:
-- kind: ServiceAccount
-  name: cloudstate-operator
-  namespace: cloudstate
+  - kind: ServiceAccount
+    name: cloudstate-operator
+    namespace: cloudstate
 roleRef:
   kind: ClusterRole
   name: cloudstate-operator-role
@@ -146,8 +145,8 @@ kind: RoleBinding
 metadata:
   name: cloudstate-operator
 subjects:
-- kind: ServiceAccount
-  name: cloudstate-operator
+  - kind: ServiceAccount
+    name: cloudstate-operator
 roleRef:
   kind: Role
   name: cloudstate-operator-role
@@ -174,23 +173,43 @@ spec:
     spec:
       serviceAccountName: cloudstate-operator
       containers:
-      - name: operator
-        image: cloudstateio/cloudstate-operator:0.4.3
+        - name: operator
+          image: cloudstateio/cloudstate-operator:0.4.3
 
-        env:
-        - name: JAVA_OPTS
-          value: "-Xms128m -Xmx128m"
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: "metadata.namespace"
-        - name: CONFIG_MAP
-          value: cloudstate-operator-config
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms128m -Xmx128m"
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: "metadata.namespace"
+            - name: CONFIG_MAP
+              value: cloudstate-operator-config
 
-        resources:
-          limits:
-            memory: 256Mi
-          requests:
-            cpu: 0.1
-            memory: 256Mi
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              cpu: 0.1
+              memory: 256Mi
 
+---
+
+apiVersion: cloudstate.io/v1alpha1
+kind: StatefulStore
+metadata:
+  name: inmemory
+spec:
+  type: InMemory
+
+---
+
+apiVersion: cloudstate.io/v1alpha1
+kind: StatefulService
+metadata:
+  name: shopping-cart
+spec:
+  datastore:
+    name: inmemory
+  containers:
+    - image: politrons/shopping-cart:latest
