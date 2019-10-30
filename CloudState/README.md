@@ -6,9 +6,13 @@ You can implement your **gRPC** service using the current [Cloudstate DSL](https
 
 Here I implement an Event sourcing service using as Data Store the **InMemory** option
 
+[Protobuf files](src/main/proto)
 [Event sourcing](src/main/java/io/cloudstate/shopping/ShoppingCartEntity.java)
     
-### Docker
+### ![My image](../src/main/resources/img/docker.png)
+
+**Cloudstate** deploy StatefulService using docker images, so the service that you implement must be save into a docker image
+that run that service.
 
 * Plugin to Create and push image of the Service into docker hub
 
@@ -53,7 +57,7 @@ Here I implement an Event sourcing service using as Data Store the **InMemory** 
             </plugin>    
 ```
 
-    Using in the plugin ``<name>politrons/shopping-cart:%l</name>``` it means it will be publish in my personal docker hub **politrons**
+Using in the plugin ``<name>politrons/shopping-cart:%l</name>``` it means it will be publish in my personal docker hub **politrons**
 
 * Create image ``Docker build``
 * Push image ``Docker push``
