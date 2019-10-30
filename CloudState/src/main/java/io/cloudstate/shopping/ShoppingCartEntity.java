@@ -101,14 +101,16 @@ public class ShoppingCartEntity {
     public void itemAdded(Domain.ItemAdded event) {
         System.out.println("Processing ItemAdded event:" + event);
         Protocol.LineItem item = cart.get(event.getItem().getProductId());
-        if (item == null) {
-            item = convert(event.getItem());
-        } else {
-            item = item.toBuilder()
-                    .setQuantity(item.getQuantity() + event.getItem().getQuantity())
-                    .build();
-        }
+        item = item == null ?
+                transformDomainItemToProtocol(event.getItem()) :
+                updateItem(event, item);
         cart.put(item.getProductId(), item);
+    }
+
+    private Protocol.LineItem updateItem(Domain.ItemAdded event, Protocol.LineItem item) {
+        return item.toBuilder()
+                .setQuantity(item.getQuantity() + event.getItem().getQuantity())
+                .build();
     }
 
     /**
@@ -120,15 +122,6 @@ public class ShoppingCartEntity {
         cart.remove(event.getProductId());
     }
 
-    private Protocol.LineItem convert(Domain.LineItem item) {
-        return Protocol.LineItem.newBuilder()
-                .setProductId(item.getProductId())
-                .setName(item.getName())
-                .setQuantity(item.getQuantity())
-                .build();
-    }
-
-
     // SNAPSHOT
     //----------
 
@@ -139,11 +132,34 @@ public class ShoppingCartEntity {
     @Snapshot
     public Domain.Cart snapshot() {
         return Domain.Cart.newBuilder()
-                .addAllItems(cart.values().stream().map(this::convert).collect(Collectors.toList()))
+                .addAllItems(cart.values().stream().map(this::transformProtocolItemToDomain).collect(Collectors.toList()))
                 .build();
     }
 
-    private Domain.LineItem convert(Protocol.LineItem item) {
+    /**
+     * When the entity is rehydrate again, the snapshot will first be loaded before any other events are received, and passed to a snapshot handler
+     **/
+    @SnapshotHandler
+    public void handleSnapshot(Domain.Cart cart) {
+        System.out.println("Rehydrate shopping cart from Data store:" + cart);
+        this.cart.clear();
+        for (Domain.LineItem item : cart.getItemsList()) {
+            this.cart.put(item.getProductId(), transformDomainItemToProtocol(item));
+        }
+    }
+
+    // UTILS
+    //----------
+
+    private Protocol.LineItem transformDomainItemToProtocol(Domain.LineItem item) {
+        return Protocol.LineItem.newBuilder()
+                .setProductId(item.getProductId())
+                .setName(item.getName())
+                .setQuantity(item.getQuantity())
+                .build();
+    }
+
+    private Domain.LineItem transformProtocolItemToDomain(Protocol.LineItem item) {
         return Domain.LineItem.newBuilder()
                 .setProductId(item.getProductId())
                 .setName(item.getName())
@@ -151,17 +167,4 @@ public class ShoppingCartEntity {
                 .build();
     }
 
-    /**
-     * When the entity is REYDRATE again, the snapshot will first be loaded before any other events are received, and passed to a snapshot handler
-     *
-     * @param cart
-     */
-    @SnapshotHandler
-    public void handleSnapshot(Domain.Cart cart) {
-        System.out.println("Rehydrate shopping cart from Data store:" + cart);
-        this.cart.clear();
-        for (Domain.LineItem item : cart.getItemsList()) {
-            this.cart.put(item.getProductId(), convert(item));
-        }
-    }
 }
