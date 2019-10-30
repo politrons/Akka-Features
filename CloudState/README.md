@@ -67,7 +67,7 @@ Using in the plugin ``<name>politrons/shopping-cart:%l</name>``` it means it wil
 ### ![My image](../src/main/resources/img/kubernete.png)
 
 ``Cloudstate`` use K8s with some operators to work as proxy, and route gRPC/Rest communication from the transport
- layer into the service, so the users can focus in business logic, and forget about transport layer.
+ layer into the service, so the users can focus on business logic, and forget about transport layer, scalability and recover failing services.
 
 * Delete namespace
 
@@ -82,14 +82,14 @@ Using in the plugin ``<name>politrons/shopping-cart:%l</name>``` it means it wil
     ```
     
 * Download **cloudstate** yaml file that you can find [here](https://github.com/cloudstateio/cloudstate/tags) and deploy it.
-
+  
     ```
-        kubectl apply -n cloudstate -f src/main/resources/cloudstate.yaml
+    kubectl apply -n cloudstate -f src/main/resources/cloudstate.yaml
     
     ```
     
 
-* Add in the **service** yaml file the ``StatefulStore``, ``StatefulService`` and the ``Service`` to route connections from outside the cluster
+* Create a **service** yaml file, and add the ``StatefulStore``, ``StatefulService`` and the ``Service`` to route connections from outside the cluster to the ``StatefulService``
 
     ```
     apiVersion: cloudstate.io/v1alpha1
@@ -132,13 +132,11 @@ Using in the plugin ``<name>politrons/shopping-cart:%l</name>``` it means it wil
     
     ```
 
-
-
 ### Consume service
 
-* Get cart
+* Get cart 
     ```
-    curl http://localhost:1981/carts/politrons
+    curl http://localhost:1981/carts/politrons //politrons is the user_Id
     
     ```
 * Add products
