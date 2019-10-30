@@ -137,7 +137,9 @@ Here I implement an Event sourcing service using as Data Store the **InMemory** 
 * Add products
     ```
     curl -X POST -H 'Content-Type: application/json' http://localhost:1981/cart/politrons/items/add -d '{"product_id":"uuidCode","name":"coca-cola","quantity":1}'
-    
+    curl -X POST -H 'Content-Type: application/json' http://localhost:1981/cart/politrons/items/add -d '{"product_id":"uuidCode1","name":"doritos","quantity":2}'
+    curl -X POST -H 'Content-Type: application/json' http://localhost:1981/cart/politrons/items/add -d '{"product_id":"uuidCode2","name":"Budweiser","quantity":6}'
+
     ```
 * Get item
     ```
