@@ -1,12 +1,12 @@
-# CloudState
+# ![My image](../src/main/resources/img/cloudstate.png)
 
-### Service
+### ![My image](../src/main/resources/img/grpc.png)
 
-You can implement your service using the current [Cloudstate DSL](https://cloudstate.io/docs/user/features/index.html).
+You can implement your **gRPC** service using the current [Cloudstate DSL](https://cloudstate.io/docs/user/features/index.html).
 
 Here I implement an Event sourcing service using as Data Store the **InMemory** option
 
-[Event sourcing](CloudState/src/main/java/io/cloudstate/shopping/ShoppingCartEntity.java)
+[Event sourcing](src/main/java/io/cloudstate/shopping/ShoppingCartEntity.java)
     
 ### Docker
 
@@ -59,8 +59,10 @@ Here I implement an Event sourcing service using as Data Store the **InMemory** 
 * Push image ``Docker push``
 
 
-### K8s
+### ![My image](../src/main/resources/img/kubernete.png)
 
+``Cloudstate`` use K8s with some operators to work as proxy, and route gRPC/Rest communication from the transport
+ layer into the service, so the users can focus in business logic, and forget about transport layer.
 
 * Delete namespace
 
