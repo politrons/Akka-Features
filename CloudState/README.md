@@ -6,8 +6,9 @@ You can implement your **gRPC** service using the current [Cloudstate DSL](https
 
 Here I implement an Event sourcing service using as Data Store the **InMemory** option
 
-[Protobuf files](src/main/proto)
-[Event sourcing](src/main/java/io/cloudstate/shopping/ShoppingCartEntity.java)
+* [Protobuf files](src/main/proto)
+
+* [Event sourcing](src/main/java/io/cloudstate/shopping/ShoppingCartEntity.java)
     
 ### ![My image](../src/main/resources/img/docker.png)
 
