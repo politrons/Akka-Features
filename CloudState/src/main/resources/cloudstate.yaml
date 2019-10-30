@@ -186,24 +186,3 @@ spec:
             requests:
               cpu: 0.1
               memory: 256Mi
-
----
-
-apiVersion: cloudstate.io/v1alpha1
-kind: StatefulStore
-metadata:
-  name: inmemory
-spec:
-  type: InMemory
-
----
-
-apiVersion: cloudstate.io/v1alpha1
-kind: StatefulService
-metadata:
-  name: shopping-cart
-spec:
-  datastore:
-    name: inmemory
-  containers:
-    - image: politrons/shopping-cart:latest

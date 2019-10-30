@@ -2,7 +2,7 @@
 
 ### Service
 
-You can implement your service using the current DSL.
+You can implement your service using the current [Cloudstate DSL](https://cloudstate.io/docs/user/features/index.html).
 
 Here I implement an Event sourcing service using as Data Store the **InMemory** option
 
@@ -61,36 +61,91 @@ Here I implement an Event sourcing service using as Data Store the **InMemory** 
 
 ### K8s
 
+
+* Delete namespace
+
+    ```
+    kubectl delete namespace cloudstate
+    ```
+    
 * Create namespace
 
     ```
     kubectl create namespace cloudstate
     ```
     
-* Download cloudstate.yaml yaml file that you can find [here](https://github.com/cloudstateio/cloudstate/tags)
-    
-
-* Add in the yaml file your service to be deployed
+* Download **cloudstate** yaml file that you can find [here](https://github.com/cloudstateio/cloudstate/tags) and deploy it.
 
     ```
+        kubectl apply -n cloudstate -f src/main/resources/cloudstate.yaml
+    
+    ```
+    
+
+* Add in the **service** yaml file the ``StatefulStore``, ``StatefulService`` and the ``Service`` to route connections from outside the cluster
+
+    ```
+    apiVersion: cloudstate.io/v1alpha1
+    kind: StatefulStore
+    metadata:
+      name: inmemory
+    spec:
+      type: InMemory
     ---
+    
     apiVersion: cloudstate.io/v1alpha1
     kind: StatefulService
     metadata:
-      name: shopping-cart
+      name: cloudstate-shopping-cart
+      labels:
+        app: cloudstate-shopping-cart
     spec:
       datastore:
         name: inmemory
       containers:
         - image: politrons/shopping-cart:latest
+    ---
+    
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: cloudstate-shopping-cart-service
+    spec:
+      type: LoadBalancer
+      ports:
+        - port: 1981
+          targetPort: 8013
+      selector:
+        app: cloudstate-shopping-cart
+    ```
+* Deploy service
+
+    ```
+        kubectl apply -n cloudstate -f src/main/resources/service.yaml
+    
     ```
 
-* Create Operator in new namespace
-
-```
-    kubectl apply -n cloudstate -f src/main/resource/cloudstate.yaml
-
-```
 
 
+### Consume service
 
+* Get cart
+    ```
+    curl http://localhost:1981/carts/politrons
+    
+    ```
+* Add products
+    ```
+    curl -X POST -H 'Content-Type: application/json' http://localhost:1981/cart/politrons/items/add -d '{"product_id":"uuidCode","name":"coca-cola","quantity":1}'
+    
+    ```
+* Get item
+    ```
+    curl http://localhost:1981/cart/uuidCode
+    
+    ```    
+* Delete product
+    ```
+    curl http://localhost:1981/cart/politrons/items/uuidCode/remove
+    
+    ```

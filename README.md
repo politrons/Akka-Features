@@ -72,3 +72,6 @@ Most common features of Akka ecosystem of lightbend
     
     * [Server](AkkaStreamHttp/src/main/scala/stream/HttpAkkaStream.scala)    
 
+* **CloudState IO**
+
+    *[Project](CloudState)
