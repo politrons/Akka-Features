@@ -8,6 +8,6 @@
         <parameter value="-target:jvm-1.8" />
       </parameters>
     </profile>
-    <profile name="Maven 1" modules="CloudState" />
+    <profile name="Maven 1" modules="CloudState,CloudStateConnectors" />
   </component>
 </project>

@@ -1,0 +1,33 @@
+
+apiVersion: cloudstate.io/v1alpha1
+kind: StatefulStore
+metadata:
+  name: inmemory
+spec:
+  type: InMemory
+---
+
+apiVersion: cloudstate.io/v1alpha1
+kind: StatefulService
+metadata:
+  name: cloudstate-rest-connector
+  labels:
+    app: cloudstate-rest-connector
+spec:
+  datastore:
+    name: inmemory
+  containers:
+    - image: politrons/rest-connector:latest
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudstate-rest-connector-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 2981
+      targetPort: 8013
+  selector:
+    app: cloudstate-rest-connector

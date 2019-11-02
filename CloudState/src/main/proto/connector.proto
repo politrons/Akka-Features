@@ -1,0 +1,22 @@
+//Proto file that describe the protocol communication between Commands and Event handlers
+
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "cloudstate/entity_key.proto";
+
+package io.cloudstate.connector;
+
+service RestConnector {
+    rpc GetRequest(GetEntity) returns (Response);
+}
+
+message Response {
+    string response = 1;
+}
+
+message GetEntity {
+    string user_id = 1 [(.cloudstate.entity_key) = true];
+    string url = 2;
+}
+

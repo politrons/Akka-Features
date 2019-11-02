@@ -1,9 +1,13 @@
 package io.cloudstate.shopping;
 
 import com.google.protobuf.Empty;
+import io.cloudstate.connector.Connector;
+import io.cloudstate.connector.RestConnectorGrpc;
 import io.cloudstate.javasupport.EntityId;
 import io.cloudstate.javasupport.eventsourced.*;
 import io.cloudstate.shopping.domain.Domain;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,6 +39,7 @@ public class ShoppingCartEntity {
     @CommandHandler
     public Protocol.Cart getCart(Protocol.GetShoppingCart getShoppingCartQuery) {
         System.out.println("Get current Cart state for user:" + getShoppingCartQuery.getUserId());
+        connectorTest();
         return Protocol.Cart.newBuilder().addAllItems(cart.values()).build();
     }
 
@@ -164,6 +169,39 @@ public class ShoppingCartEntity {
                 .setProductId(item.getProductId())
                 .setName(item.getName())
                 .setQuantity(item.getQuantity())
+                .build();
+    }
+
+
+
+    private void connectorTest() {
+        ManagedChannel channel = getManagedChannel();
+        RestConnectorGrpc.RestConnectorBlockingStub stub = getRpcServiceStub(channel);
+
+        Connector.Response response = stub.getRequest(Connector.GetEntity.newBuilder()
+                .setUserId("politrons")
+                .setUrl("url")
+                .build());
+
+        System.out.println("Connector response:" + response);
+        channel.shutdown();
+    }
+
+    /**
+     * From the contract of the proto we create the FutureStub. There´re other strategies as Sync communication.
+     *
+     * @return
+     */
+    private static RestConnectorGrpc.RestConnectorBlockingStub getRpcServiceStub(ManagedChannel channel) {
+        return RestConnectorGrpc.newBlockingStub(channel);
+    }
+
+    /**
+     * ManagedChannel is communication channel for the RPC
+     */
+    private static ManagedChannel getManagedChannel() {
+        return ManagedChannelBuilder.forAddress("cloudstate-rest-connector-service.cloudstate", 2981)
+                .usePlaintext(true)
                 .build();
     }
 
