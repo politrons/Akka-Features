@@ -172,37 +172,21 @@ public class ShoppingCartEntity {
                 .build();
     }
 
-
+    private RestConnectorGrpc.RestConnectorBlockingStub restConnector =
+            RestConnectorGrpc.newBlockingStub(ManagedChannelBuilder
+                    .forAddress("cloudstate-rest-connector-service.cloudstate", 2981)
+                    .usePlaintext(true)
+                    .build());
 
     private void connectorTest() {
-        ManagedChannel channel = getManagedChannel();
-        RestConnectorGrpc.RestConnectorBlockingStub stub = getRpcServiceStub(channel);
 
-        Connector.Response response = stub.getRequest(Connector.GetEntity.newBuilder()
+        Connector.Response response = restConnector.getRequest(Connector.GetEntity.newBuilder()
                 .setUserId("politrons")
                 .setUrl("url")
                 .build());
 
         System.out.println("Connector response:" + response);
-        channel.shutdown();
     }
 
-    /**
-     * From the contract of the proto we create the FutureStub. There´re other strategies as Sync communication.
-     *
-     * @return
-     */
-    private static RestConnectorGrpc.RestConnectorBlockingStub getRpcServiceStub(ManagedChannel channel) {
-        return RestConnectorGrpc.newBlockingStub(channel);
-    }
-
-    /**
-     * ManagedChannel is communication channel for the RPC
-     */
-    private static ManagedChannel getManagedChannel() {
-        return ManagedChannelBuilder.forAddress("cloudstate-rest-connector-service.cloudstate", 2981)
-                .usePlaintext(true)
-                .build();
-    }
 
 }
