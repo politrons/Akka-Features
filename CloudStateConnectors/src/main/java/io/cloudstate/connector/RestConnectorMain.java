@@ -13,7 +13,7 @@ public class RestConnectorMain {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         Descriptors.ServiceDescriptor shoppingCartService = Connector.getDescriptor().findServiceByName("RestConnector");
-        System.out.println("Protocol descriptor:" + shoppingCartService);
+        System.out.println("Rest Connector:" + shoppingCartService);
         new CloudState()
                 .registerEventSourcedEntity(
                         RestConnector.class,
