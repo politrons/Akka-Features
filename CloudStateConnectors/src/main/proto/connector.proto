@@ -8,14 +8,14 @@ import "cloudstate/entity_key.proto";
 package io.cloudstate.connector;
 
 service RestConnector {
-    rpc GetRequest(GetEntity) returns (Response);
+    rpc GetRequest(RestRequest) returns (Response);
 }
 
 message Response {
     string response = 1;
 }
 
-message GetEntity {
+message RestRequest {
     string user_id = 1 [(.cloudstate.entity_key) = true];
     string url = 2;
 }

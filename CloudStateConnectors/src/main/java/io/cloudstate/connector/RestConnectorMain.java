@@ -12,12 +12,14 @@ import java.util.concurrent.ExecutionException;
 public class RestConnectorMain {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        Descriptors.ServiceDescriptor shoppingCartService = Connector.getDescriptor().findServiceByName("RestConnector");
-        System.out.println("Rest Connector:" + shoppingCartService);
+        System.out.println("Hello connector");
+
+        Descriptors.ServiceDescriptor restConnector = Connector.getDescriptor().findServiceByName("RestConnector");
+        System.out.println("Coudstate Rest Connector:" + restConnector);
         new CloudState()
-                .registerEventSourcedEntity(
+                .registerCrdtEntity(
                         RestConnector.class,
-                        shoppingCartService)
+                        restConnector)
                 .start()
                 .toCompletableFuture()
                 .get();

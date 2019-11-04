@@ -180,7 +180,7 @@ public class ShoppingCartEntity {
 
     private void connectorTest() {
 
-        Connector.Response response = restConnector.getRequest(Connector.GetEntity.newBuilder()
+        Connector.Response response = restConnector.getRequest(Connector.RestRequest.newBuilder()
                 .setUserId("politrons")
                 .setUrl("url")
                 .build());

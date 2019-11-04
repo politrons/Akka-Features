@@ -134,6 +134,11 @@
             <artifactId>cloudstate-java-support</artifactId>
             <version>0.4.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.9.0</version>
+        </dependency>
     </dependencies>
 
     <properties>

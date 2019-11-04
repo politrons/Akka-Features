@@ -1,14 +1,25 @@
 package io.cloudstate.connector
 
 import io.cloudstate.javasupport.EntityId
-import io.cloudstate.javasupport.eventsourced._
+import io.cloudstate.javasupport.crdt._
 
-@EventSourcedEntity(persistenceId = "connector-actions", snapshotEvery = 20)
-class RestConnector(@EntityId val entityId: String) {
+@CrdtEntity
+class RestConnector(ctx: CrdtCreationContext, @EntityId val entityId: String) {
+
+  private val endpoints: ORMap[String, LWWRegister[Connector.RestRequest]] = ctx.newORMap()
+
+  private val sharedEndpoints: LWWRegisterMap[String, Connector.RestRequest] = new LWWRegisterMap(endpoints)
 
   @CommandHandler
-  def getRequest(requestCommand: Connector.GetEntity): Connector.Response = {
+  def getRequest(requestCommand: Connector.RestRequest): Connector.Response = {
     System.out.println("Request to Connector:" + requestCommand.getUrl)
-    Connector.Response.newBuilder.setResponse("hello rest connector world").build
+    Option(sharedEndpoints.get(requestCommand.getUrl)) match {
+      case Some(request) =>
+        Connector.Response.newBuilder.setResponse(s"this request ${request.getUrl} was catched").build
+      case None =>
+        System.out.println("Adding new service in CRDT for uri:" + requestCommand.getUrl)
+        sharedEndpoints.put(requestCommand.getUrl, requestCommand)
+        Connector.Response.newBuilder.setResponse("new Request here").build
+    }
   }
 }

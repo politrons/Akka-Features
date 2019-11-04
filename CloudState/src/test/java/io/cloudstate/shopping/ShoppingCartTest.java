@@ -1,15 +1,14 @@
 package io.cloudstate.shopping;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+//@Ignore
 public class ShoppingCartTest {
 
 

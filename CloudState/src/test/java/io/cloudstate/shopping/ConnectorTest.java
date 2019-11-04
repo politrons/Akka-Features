@@ -4,11 +4,13 @@ import io.cloudstate.connector.Connector;
 import io.cloudstate.connector.RestConnectorGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+@Ignore
 public class ConnectorTest {
 
 
@@ -17,7 +19,7 @@ public class ConnectorTest {
         ManagedChannel channel = getManagedChannel();
         RestConnectorGrpc.RestConnectorBlockingStub stub = getRpcServiceStub(channel);
 
-        Connector.Response response = stub.getRequest(Connector.GetEntity.newBuilder()
+        Connector.Response response = stub.getRequest(Connector.RestRequest.newBuilder()
                 .setUserId("politrons")
                 .setUrl("url")
                 .build());
