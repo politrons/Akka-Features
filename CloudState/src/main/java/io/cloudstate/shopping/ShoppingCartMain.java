@@ -3,9 +3,9 @@ package io.cloudstate.shopping;
 import com.google.protobuf.Descriptors;
 import io.cloudstate.javasupport.CloudState;
 import io.cloudstate.shopping.domain.Domain;
-import org.slf4j.Logger;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Main class to register the entity created using [CloudState] instance and the [registerEventSourcedEntity]
@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class ShoppingCartMain {
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+    public static void main(String[] args) throws ExecutionException, InterruptedException, TimeoutException {
         Descriptors.ServiceDescriptor shoppingCartService = Protocol.getDescriptor().findServiceByName("ShoppingCart");
         Descriptors.FileDescriptor descriptor = Domain.getDescriptor();
         System.out.println("Protocol descriptor:" + shoppingCartService);
@@ -27,4 +27,5 @@ public class ShoppingCartMain {
                 .toCompletableFuture()
                 .get();
     }
+
 }
