@@ -1,21 +1,11 @@
 
 apiVersion: cloudstate.io/v1alpha1
-kind: StatefulStore
-metadata:
-  name: inmemory
-spec:
-  type: InMemory
----
-
-apiVersion: cloudstate.io/v1alpha1
 kind: StatefulService
 metadata:
   name: cloudstate-rest-connector
   labels:
     app: cloudstate-rest-connector
 spec:
-  datastore:
-    name: inmemory
   containers:
     - image: politrons/rest-connector:latest
 ---
