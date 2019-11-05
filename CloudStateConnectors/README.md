@@ -16,8 +16,8 @@ Here I implement an CRDT(Conflict free replicate data type) connector service.
 
 * [Protobuf files](src/main/proto)
 
-* [Rest connector](src/main/scala/io/cloudstate/connector/RestConnector)
-    
+* [Rest connector](src/main/scala/io.cloudstate.connector/RestConnector.scala)
+
 ### ![My image](../src/main/resources/img/docker.png)
 
 **Cloudstate** deploy StatefulService using docker images, so the service that you implement must be save into a docker image
