@@ -1,4 +1,6 @@
-# ![My image](../src/main/resources/img/cloudstate.png) Rest connector Service
+![My image](../src/main/resources/img/cloudstate.png)
+ 
+# Rest connector Service
 
 Service Connectors make services easier to use by hiding the specifics of communications-related APIs. Also as a k8s service it does not
 require any reboot or update the service that consume this connector, as long as the contract between them does not change.
@@ -14,7 +16,7 @@ Here I implement an CRDT(Conflict free replicate data type) connector service.
 
 * [Protobuf files](src/main/proto)
 
-* [Rest connector](src/main/java/io/cloudstate/connector/RestConnector)
+* [Rest connector](src/main/scala/io/cloudstate/connector/RestConnector)
     
 ### ![My image](../src/main/resources/img/docker.png)
 
