@@ -196,7 +196,7 @@ public class ShoppingCartEntity {
                 .setUserId("politrons")
                 .setHost("www.mocky.io")
                 .setPort(80)
-                .setEndpoint("/v2/5185415ba171ea3a00704eed")
+                .setUri("/v2/5185415ba171ea3a00704eed")
                 .setMethod(Method.GET)
                 .build());
 

@@ -28,21 +28,24 @@ class RestConnector(ctx: CrdtCreationContext, @EntityId val entityId: String) {
 
   private val sharedEndpoints: LWWRegisterMap[String, RestRequest] = new LWWRegisterMap(endpoints)
 
+  private var services: Map[String, Service[Request, Response]] = Map()
+
   @CommandHandler
   def makeRequest(requestCommand: RestRequest): RestResponse = {
     Try {
-      val api = requestCommand.getHost + requestCommand.getEndpoint
-      System.out.println("Request to Connector:" + api)
-      val service: Service[Request, Response] = Http.newService(s"${requestCommand.getHost}:${requestCommand.getPort}")
-      val request = http.Request(getMethod(requestCommand), requestCommand.getEndpoint)
+      val endpoint = requestCommand.getHost + requestCommand.getUri
+      System.out.println("Request to Connector:" + endpoint)
+      val request = http.Request(getMethod(requestCommand), requestCommand.getUri)
       request.host = requestCommand.getHost
 
-      Option(sharedEndpoints.get(api)) match {
-        case Some(_) =>
-         getBodyResponse(service(request))
+      services.get(endpoint) match {
+        case Some(service) =>
+          getBodyResponse(service(request))
         case None =>
-          System.out.println("Adding new service in CRDT for uri:" + api)
-          sharedEndpoints.put(api, requestCommand)
+          System.out.println("Adding new service in CRDT for uri:" + endpoint)
+          sharedEndpoints.put(endpoint, requestCommand)
+          val service: Service[Request, Response] = Http.newService(s"${requestCommand.getHost}:${requestCommand.getPort}")
+          services += endpoint -> service
           getBodyResponse(service(request))
       }
     }

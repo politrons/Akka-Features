@@ -23,8 +23,8 @@ public class ConnectorTest {
                 .setUserId("politrons")
                 .setMethod(Connector.Method.GET)
                 .setHost("www.mocky.io")
+                .setUri("/v2/5185415ba171ea3a00704eed")
                 .setPort(80)
-                .setEndpoint("/v2/5185415ba171ea3a00704eed")
                 .build());
 
         System.out.println("Connector response:" + response);
