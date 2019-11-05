@@ -17,5 +17,9 @@ message Response {
 
 message RestRequest {
     string user_id = 1 [(.cloudstate.entity_key) = true];
-    string url = 2;
+    string host = 2;
+    string endpoint = 3;
+    string port=4;
+    string method = 5;
+    string body = 6;
 }

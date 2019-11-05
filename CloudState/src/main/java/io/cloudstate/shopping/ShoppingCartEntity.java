@@ -6,7 +6,6 @@ import io.cloudstate.connector.RestConnectorGrpc;
 import io.cloudstate.javasupport.EntityId;
 import io.cloudstate.javasupport.eventsourced.*;
 import io.cloudstate.shopping.domain.Domain;
-import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 import java.util.LinkedHashMap;
@@ -27,6 +26,19 @@ public class ShoppingCartEntity {
         this.entityId = entityId;
     }
 
+    /**
+     * Using gRPC we create a connection with the rest connector. Since both services are running in localhost
+     * the latency in communication is pretty much the same as is executed in the same JVM.
+     * The client only need to know the host where service domain and port to communicate.
+     * The rest of the communication DSL is done by protobuf client/server generated code by the proto contract file.
+     */
+    private RestConnectorGrpc.RestConnectorBlockingStub restConnector =
+            RestConnectorGrpc.newBlockingStub(ManagedChannelBuilder
+                    .forAddress("cloudstate-rest-connector-service.cloudstate", 2981)
+                    .usePlaintext(true)
+                    .build());
+
+
     // COMMANDS
     //-----------
 
@@ -39,7 +51,8 @@ public class ShoppingCartEntity {
     @CommandHandler
     public Protocol.Cart getCart(Protocol.GetShoppingCart getShoppingCartQuery) {
         System.out.println("Get current Cart state for user:" + getShoppingCartQuery.getUserId());
-        connectorTest();
+        String price = makeRestConnectorCall();
+        System.out.println(price);
         return Protocol.Cart.newBuilder().addAllItems(cart.values()).build();
     }
 
@@ -172,20 +185,20 @@ public class ShoppingCartEntity {
                 .build();
     }
 
-    private RestConnectorGrpc.RestConnectorBlockingStub restConnector =
-            RestConnectorGrpc.newBlockingStub(ManagedChannelBuilder
-                    .forAddress("cloudstate-rest-connector-service.cloudstate", 2981)
-                    .usePlaintext(true)
-                    .build());
+    // CONNECTOR INVOCATION
+    //------------------------
 
-    private void connectorTest() {
+    private String makeRestConnectorCall() {
 
         Connector.Response response = restConnector.getRequest(Connector.RestRequest.newBuilder()
                 .setUserId("politrons")
-                .setUrl("url")
+                .setHost("www.mocky.io")
+                .setPort("80")
+                .setEndpoint("/v2/5185415ba171ea3a00704eed")
+                .setMethod("Get")
                 .build());
 
-        System.out.println("Connector response:" + response);
+        return  response.getResponse();
     }
 
 

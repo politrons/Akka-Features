@@ -21,7 +21,10 @@ public class ConnectorTest {
 
         Connector.Response response = stub.getRequest(Connector.RestRequest.newBuilder()
                 .setUserId("politrons")
-                .setUrl("url")
+                .setHost("www.mocky.io")
+                .setPort("80")
+                .setEndpoint("/v2/5185415ba171ea3a00704eed")
+                .setMethod("Get")
                 .build());
 
         System.out.println("Connector response:" + response);

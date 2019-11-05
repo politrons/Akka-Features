@@ -12,8 +12,6 @@ import java.util.concurrent.ExecutionException;
 public class RestConnectorMain {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        System.out.println("Hello connector");
-
         Descriptors.ServiceDescriptor restConnector = Connector.getDescriptor().findServiceByName("RestConnector");
         System.out.println("Coudstate Rest Connector:" + restConnector);
         new CloudState()

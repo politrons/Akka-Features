@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-//@Ignore
+@Ignore
 public class ShoppingCartTest {
 
 
