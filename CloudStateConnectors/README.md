@@ -66,7 +66,7 @@ that run that service.
             </plugin>    
 ```
 
-Using in the plugin ``<name>politrons/rest-connector:%l</name>``` it means it will be publish in my personal docker hub **politrons**
+Using in the plugin ```<name>politrons/rest-connector:%l</name>``` it means it will be publish in my personal docker hub **politrons**
 
 * Create image ``Docker build``
 * Push image ``Docker push``
