@@ -75,3 +75,4 @@ Most common features of Akka ecosystem of lightbend
 * ![My image](src/main/resources/img/cloudstate.png)
 
     * [Service](CloudState)
+    * [Rest connector](CloudStateConnectors)
