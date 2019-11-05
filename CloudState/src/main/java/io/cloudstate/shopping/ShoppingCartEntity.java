@@ -12,6 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static io.cloudstate.connector.Connector.*;
+
 /**
  * Entity ready to be used for Event Sourcing
  */
@@ -190,12 +192,12 @@ public class ShoppingCartEntity {
 
     private String makeRestConnectorCall() {
 
-        Connector.Response response = restConnector.getRequest(Connector.RestRequest.newBuilder()
+        RestResponse response = restConnector.makeRequest(RestRequest.newBuilder()
                 .setUserId("politrons")
                 .setHost("www.mocky.io")
-                .setPort("80")
+                .setPort(80)
                 .setEndpoint("/v2/5185415ba171ea3a00704eed")
-                .setMethod("Get")
+                .setMethod(Method.GET)
                 .build());
 
         return  response.getResponse();

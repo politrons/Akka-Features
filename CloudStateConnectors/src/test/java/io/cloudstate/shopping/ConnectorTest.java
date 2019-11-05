@@ -19,12 +19,12 @@ public class ConnectorTest {
         ManagedChannel channel = getManagedChannel();
         RestConnectorGrpc.RestConnectorBlockingStub stub = getRpcServiceStub(channel);
 
-        Connector.Response response = stub.getRequest(Connector.RestRequest.newBuilder()
+        Connector.RestResponse response = stub.makeRequest(Connector.RestRequest.newBuilder()
                 .setUserId("politrons")
+                .setMethod(Connector.Method.GET)
                 .setHost("www.mocky.io")
-                .setPort("80")
+                .setPort(80)
                 .setEndpoint("/v2/5185415ba171ea3a00704eed")
-                .setMethod("Get")
                 .build());
 
         System.out.println("Connector response:" + response);
