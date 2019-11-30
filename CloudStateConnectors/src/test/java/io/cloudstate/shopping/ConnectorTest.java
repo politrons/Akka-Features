@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-@Ignore
+//@Ignore
 public class ConnectorTest {
 
 
@@ -43,6 +43,7 @@ public class ConnectorTest {
 
     /**
      * ManagedChannel is communication channel for the RPC
+     * Is the ip/port where our connector service is deployed.
      */
     private static ManagedChannel getManagedChannel() {
         return ManagedChannelBuilder.forAddress("localhost", 2981)
