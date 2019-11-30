@@ -1,0 +1,188 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: statefulstores.cloudstate.io
+spec:
+  group: cloudstate.io
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+  scope: Namespaced
+  names:
+    plural: statefulstores
+    singular: statefulstore
+    kind: StatefulStore
+  subresources:
+    status: {}
+  additionalPrinterColumns:
+    - name: Type
+      type: string
+      description: The type of stateful store
+      JSONPath: .spec.type
+    - name: Age
+      type: date
+      JSONPath: .metadata.creationTimestamp
+
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: statefulservices.cloudstate.io
+spec:
+  group: cloudstate.io
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+  scope: Namespaced
+  names:
+    plural: statefulservices
+    singular: statefulservice
+    kind: StatefulService
+  subresources:
+    status: {}
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cloudstate-operator
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudstate-operator-config
+data:
+  config: |
+    cloudstate.operator {
+      # Watch configuration
+      watch {
+        # This should be a list of namespaces to watch. Either should contain a single "*" to watch all namespaces
+        # (this is configured in more detail below), or should be a list of namespaces.
+        namespaces = ["*"]
+      }
+      # Proxy configuration
+      proxy {
+        image {
+          cassandra = "cloudstateio/cloudstate-proxy-cassandra:latest"
+          postgres =  "cloudstateio/cloudstate-proxy-postgres:latest"
+          no-store = "cloudstateio/cloudstate-proxy-no-store:latest"
+          in-memory = "cloudstateio/cloudstate-proxy-in-memory:latest"
+        }
+      }
+    }
+---
+
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name: cloudstate-operator-config-reader
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "watch"]
+    resourceNames: ["cloudstate-operator-config"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: cloudstate-operator-config-reader-binding
+subjects:
+  - kind: ServiceAccount
+    name: cloudstate-operator
+roleRef:
+  kind: Role
+  name: cloudstate-operator-config-reader
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: cloudstate-operator-role
+rules:
+
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "watch"]
+
+  - apiGroups: [""]
+    resources: ["services", "pods"]
+    verbs: ["get", "create", "delete", "patch", "update", "watch", "list"]
+
+  - apiGroups: ["apps"]
+    resources: ["deployments", "deployments/scale"]
+    verbs: ["get", "create", "delete", "patch", "update", "watch", "list"]
+
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["rolebindings", "roles"]
+    verbs: ["get", "create", "delete", "patch", "update"]
+
+  - apiGroups: ["cloudstate.io"]
+    resources: ["statefulstores", "statefulservices"]
+    verbs: ["get", "list", "watch"]
+
+  - apiGroups: ["cloudstate.io"]
+    resources: ["statefulstores/status", "statefulservices/status"]
+    verbs: ["update", "patch"]
+
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: cloudstate-operator
+subjects:
+  - kind: ServiceAccount
+    name: cloudstate-operator
+    namespace: cloudstate
+roleRef:
+  kind: ClusterRole
+  name: cloudstate-operator-role
+  apiGroup: rbac.authorization.k8s.io
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudstate-operator
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: cloudstate-operator
+  template:
+    metadata:
+      labels:
+        app: cloudstate-operator
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: cloudstate-operator
+      containers:
+        - name: operator
+          image: cloudstateio/cloudstate-operator:latest
+
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms128m -Xmx128m"
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: "metadata.namespace"
+            - name: CONFIG_MAP
+              value: cloudstate-operator-config
+
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              cpu: 0.1
+              memory: 256Mi

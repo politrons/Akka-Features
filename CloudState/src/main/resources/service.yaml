@@ -1,0 +1,33 @@
+
+apiVersion: cloudstate.io/v1alpha1
+kind: StatefulStore
+metadata:
+  name: inmemory
+spec:
+  type: InMemory
+---
+
+apiVersion: cloudstate.io/v1alpha1
+kind: StatefulService
+metadata:
+  name: cloudstate-shopping-cart
+  labels:
+    app: cloudstate-shopping-cart
+spec:
+  datastore:
+    name: inmemory
+  containers:
+    - image: politrons/shopping-cart:latest
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudstate-shopping-cart-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 1981
+      targetPort: 8013
+  selector:
+    app: cloudstate-shopping-cart

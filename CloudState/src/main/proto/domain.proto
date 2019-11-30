@@ -1,0 +1,29 @@
+
+//Proto file that describe the domain of the service
+
+syntax = "proto3";
+
+package io.cloudstate.shopping.domain;
+
+option java_package = "io.cloudstate.shopping.domain";
+
+message LineItem {
+    string productId = 1;
+    string name = 2;
+    int32 quantity = 3;
+}
+
+message ItemAdded {
+    LineItem item = 1;
+}
+
+message ItemRemoved {
+    string productId = 1;
+}
+
+message CheckedOut {}
+
+message Cart {
+    repeated LineItem items = 1;
+    bool checkedout = 2;
+}
