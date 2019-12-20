@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="CloudState" />
         <module name="CloudStateConnectors" />
+        <module name="shopping-cart" />
       </profile>
     </annotationProcessing>
   </component>

@@ -47,7 +47,6 @@ class RestConnector(ctx: CrdtCreationContext, @EntityId val entityId: String) {
       logger.info("Request to Connector:" + endpoint)
       val request = http.Request(getMethod(requestCommand), requestCommand.getUri)
       request.host = requestCommand.getHost
-
       services.get(endpoint) match {
         case Some(service) =>
           getBodyResponse(service(request))
