@@ -27,7 +27,7 @@ import scala.concurrent.{Await, Future}
   *
   * This a very good pattern to use CQRS for Command/events
   */
-class AkkaTyped {
+class OldAkkaTyped {
 
   import Store._
 

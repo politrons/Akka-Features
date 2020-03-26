@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ScalaCompilerConfiguration">
-    <profile name="Gradle 2" modules="AkkaStreamHttp_main,AkkaStreamHttp_test,Akka_main,Akka_test">
+    <profile name="Gradle 2" modules="Akka.AkkaStreamHttp.main,Akka.AkkaStreamHttp.test,Akka.main,Akka.test,AkkaStreamHttp_main,AkkaStreamHttp_test,Akka_main,Akka_test">
       <option name="deprecationWarnings" value="true" />
       <option name="uncheckedWarnings" value="true" />
       <parameters>

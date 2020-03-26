@@ -12,18 +12,18 @@ Most common features of Akka ecosystem of lightbend
     * [Worker](src/main/scala/actor_system/actor/Worker.scala)
     * [Listener](src/main/scala/actor_system/actor/Listener.scala)
 
-    To run test execution [Here](src/main/scala/Runner.scala)
+    To run test execution [Here](src/main/scala/actor_system/Runner.scala)
 
 * **Typed Actor**
 
     ![My image](src/main/resources/img/typed.png)
     * [Typed](src/main/scala/typed_actor)
     
-    To run test execution [Here](src/main/scala/Runner.scala)
+    To run test execution [Here](src/main/scala/typed_actor/Runner.scala)
 
 * **Akka typed**
 
-    * [Akka typed](src/main/scala/typed/AkkaTyped.scala)
+    * [Akka typed](src/main/scala/typed/OldAkkaTyped.scala)
 
 * **Persistence**
 
@@ -59,7 +59,7 @@ Most common features of Akka ecosystem of lightbend
     * [Producer](src/main/scala/data_distribution/ProducerBot.scala)
     * [Consumer](src/main/scala/data_distribution/ConsumerBot.scala)
 
-    To run test execution [Here](src/main/scala/data_distribution/DDistributerRunner.scala)
+    To run test execution [Here](src/main/scala/data_distribution/DDistributedRunner.scala)
 
 * **Features**
 
