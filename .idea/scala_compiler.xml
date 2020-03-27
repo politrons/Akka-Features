@@ -8,6 +8,6 @@
         <parameter value="-target:jvm-1.8" />
       </parameters>
     </profile>
-    <profile name="Maven 1" modules="CloudState,CloudStateConnectors,shopping-cart" />
+    <profile name="Maven 1" modules="AkkaTyped,CloudState,CloudStateConnectors,shopping-cart" />
   </component>
 </project>

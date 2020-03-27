@@ -2,6 +2,20 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <option name="USE_RELEASE_OPTION" value="false" />
-    <bytecodeTargetLevel target="1.8" />
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="CloudStateConnectors" />
+        <module name="shopping-cart" />
+        <module name="AkkaTyped" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="1.8">
+      <module name="AkkaTyped" target="1.8" />
+      <module name="CloudStateConnectors" target="1.8" />
+      <module name="shopping-cart" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
