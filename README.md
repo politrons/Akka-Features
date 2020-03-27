@@ -14,6 +14,11 @@ Most common features of Akka ecosystem of lightbend
 
     To run test execution [Here](src/main/scala/actor_system/Runner.scala)
 
+* **Akka actor typed**
+
+    * [Fire & Forget](AkkaTyped/src/main/scala/com/akkaTyped/AkkaTypedFireAndForget.scala)
+    * [Request/Response](AkkaTyped/src/main/scala/com/akkaTyped/AkkaTypedRequestResponse.scala)
+
 * **Typed Actor**
 
     ![My image](src/main/resources/img/typed.png)
@@ -21,9 +26,6 @@ Most common features of Akka ecosystem of lightbend
     
     To run test execution [Here](src/main/scala/typed_actor/Runner.scala)
 
-* **Akka typed**
-
-    * [Akka typed](src/main/scala/typed/OldAkkaTyped.scala)
 
 * **Persistence**
 
