@@ -18,6 +18,7 @@ To run test execution [Here](src/main/scala/actor_system/Runner.scala)
 * [Fire & Forget](AkkaTyped/src/main/scala/com/akkaTyped/AkkaTypedFireAndForget.scala)
 * [Request/Response](AkkaTyped/src/main/scala/com/akkaTyped/AkkaTypedRequestResponse.scala)
 * [Ask pattern](AkkaTyped/src/main/scala/com/akkaTyped/AkkaTypedAskPattern.scala)
+* [Ask pattern out of Actor System](AkkaTyped/src/main/scala/com/akkaTyped/AkkaTypedFromOutsideActor.scala)
 
 ###  **Typed Actor**
 
