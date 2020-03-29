@@ -3,9 +3,6 @@ package com.akkaTyped
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import com.akkaTyped.AkkaTypedFireAndForget.Actor1.Actor1Message
-import com.akkaTyped.AkkaTypedRequestResponse.Actor2.Actor2Message1
-
-import scala.util.Random
 
 object AkkaTypedFireAndForget extends App {
 

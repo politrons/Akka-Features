@@ -1,15 +1,15 @@
 package com.akkaTyped
 
-import akka.actor.{Scheduler, typed}
+import akka.actor.typed
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.util.Timeout
 import com.akkaTyped.AkkaTypedFromOutsideActor.TypedActor.TypedActorMessage
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
-import akka.actor.typed.scaladsl.AskPattern._
-import akka.util.Timeout
 
 object AkkaTypedFromOutsideActor extends App {
 
