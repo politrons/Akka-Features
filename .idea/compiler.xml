@@ -8,8 +8,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="CloudStateConnectors" />
-        <module name="shopping-cart" />
         <module name="AkkaTyped" />
+        <module name="shopping-cart" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
